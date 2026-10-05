@@ -1,0 +1,63 @@
+diff --git a/public/game-sw.js b/public/game-sw.js
+index 7dfbea3..ca8da2a 100644
+--- a/public/game-sw.js
++++ b/public/game-sw.js
+@@ -32,9 +32,13 @@ function getBundle(id) {
+   )
+ }
+ 
++// The worker's scope is wherever the app is deployed: "/" locally, "/kilobyte/" on a subpath.
++const LOCAL_GAME_PREFIX = `${new URL(self.registration.scope).pathname}local-game/`
++
+ self.addEventListener('fetch', (event) => {
+   const url = new URL(event.request.url)
+-  const match = url.pathname.match(/^\/local-game\/([^/]+)\/(.*)$/)
++  if (!url.pathname.startsWith(LOCAL_GAME_PREFIX)) return
++  const match = url.pathname.slice(LOCAL_GAME_PREFIX.length).match(/^([^/]+)\/(.*)$/)
+   if (!match) return
+   const id = decodeURIComponent(match[1])
+   let path = decodeURIComponent(match[2] || 'index.html')
+diff --git a/src/data/catalog.ts b/src/data/catalog.ts
+index f7ef1d2..e613138 100644
+--- a/src/data/catalog.ts
++++ b/src/data/catalog.ts
+@@ -26,7 +26,11 @@ function htmlGame(
+     house: true,
+     bytes: 18_000,
+     rating,
+-    source: { kind: 'html', entry: 'index.html', href: `/games/${folder}/index.html` },
++    source: {
++      kind: 'html',
++      entry: 'index.html',
++      href: `${import.meta.env.BASE_URL}games/${folder}/index.html`,
++    },
+   }
+ }
+ 
+diff --git a/src/lib/idb.ts b/src/lib/idb.ts
+index c577d38..ce0c0b6 100644
+--- a/src/lib/idb.ts
++++ b/src/lib/idb.ts
+@@ -56,6 +56,6 @@ export async function deleteBundle(id: string): Promise<void> {
+ 
+ export async function ensureGameWorker(): Promise<void> {
+   if (!('serviceWorker' in navigator)) return
+-  await navigator.serviceWorker.register('/game-sw.js')
++  await navigator.serviceWorker.register(`${import.meta.env.BASE_URL}game-sw.js`)
+   await navigator.serviceWorker.ready
+ }
+diff --git a/src/lib/record.ts b/src/lib/record.ts
+index efe0164..2a4b450 100644
+--- a/src/lib/record.ts
++++ b/src/lib/record.ts
+@@ -50,7 +50,9 @@ export function playUrlFor(game: GameRecord): string | undefined {
+   const { source } = game
+   if (source.kind === 'github') return source.playUrl
+   if (source.kind === 'html') return source.href
+-  if (source.kind === 'upload') return `/local-game/${encodeURIComponent(game.id)}/${source.entry}`
++  if (source.kind === 'upload') {
++    return `${import.meta.env.BASE_URL}local-game/${encodeURIComponent(game.id)}/${source.entry}`
++  }
+   return undefined
+ }
+ 

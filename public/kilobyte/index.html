@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/kilobyte/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#eef0f5" />
+    <meta
+      name="description"
+      content="Kilobyte — play browser games, or publish yours. Files stay on GitHub or your machine."
+    />
+    <script>
+      try {
+        const raw = localStorage.getItem('kilobyte.arcade.v2')
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (parsed && parsed.settings && parsed.settings.theme === 'dark') {
+            document.documentElement.dataset.theme = 'dark'
+            document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#09090b')
+          }
+        }
+      } catch (e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>Kilobyte — browser games</title>
+    <script type="module" crossorigin src="/kilobyte/assets/index-CZl3M7Q9.js"></script>
+    <link rel="stylesheet" crossorigin href="/kilobyte/assets/index-QXGCqjgn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

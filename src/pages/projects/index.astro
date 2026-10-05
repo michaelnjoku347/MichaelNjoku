@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FeaturedProject from '../../components/FeaturedProject.astro';
+import Icon from '../../components/Icon.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import { profile } from '../../data/site';
+import { getProjects, projectTypes } from '../../lib/projects';
+
+const projects = await getProjects();
+const featured = projects.filter((project) => project.data.featured);
+const others = projects.filter((project) => !project.data.featured);
+const types = projectTypes(projects);
+const count = (type: string) => projects.filter((project) => project.data.type === type).length;
+const plural = (n: number) => `${n} project${n === 1 ? '' : 's'}`;
+---
+
+<BaseLayout
+  title="Projects"
+  description={`Everything ${profile.name} has built, including Kilobyte, a browser-game catalog you can play in your browser.`}
+>
+  <header class="page-hero">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/"><Icon name="arrow-left" size={16} />Home</a>
+      </nav>
+      <p class="eyebrow" data-reveal>Projects · {plural(projects.length)}</p>
+      <h1 data-reveal style="--reveal-delay: 1">Things I’ve built.</h1>
+      <p class="section-lede" data-reveal style="--reveal-delay: 2">
+        Apps, sites, and practice code, newest and favorite first. Open a project to read more, try the live demo, or
+        look through the code.
+      </p>
+      {
+        types.length > 1 && (
+          <div class="filters" role="group" aria-label="Filter projects by type" data-filters data-reveal style="--reveal-delay: 3">
+            <button type="button" aria-pressed="true" data-filter="">
+              All <span>{projects.length}</span>
+            </button>
+            {types.map((type) => (
+              <button type="button" aria-pressed="false" data-filter={type}>
+                {type} <span>{count(type)}</span>
+              </button>
+            ))}
+          </div>
+        )
+      }
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+    </div>
+  </header>
+
+  <section class="container projects-list" aria-label="All projects" data-filter-scope>
+    {featured.map((project) => <FeaturedProject project={project} />)}
+    <ProjectGrid projects={others} />
+  </section>
+</BaseLayout>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem 0.5rem 1rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .filters button:hover {
+    color: var(--text);
+    border-color: var(--text-3);
+  }
+
+  .filters button span {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--surface-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  .filters button[aria-pressed='true'] {
+    border-color: transparent;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .filters button[aria-pressed='true'] span {
+    background: rgb(29 20 4 / 0.14);
+  }
+
+  .projects-list {
+    padding-bottom: clamp(4rem, 8vw, 6rem);
+  }
+</style>

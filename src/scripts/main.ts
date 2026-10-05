@@ -12,45 +12,8 @@ const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
-/* ---------- Keyboard hint ---------- */
-
 if (/Mac|iPhone|iPad|iPod/.test(navigator.userAgent)) {
   $$('[data-mod-key]').forEach((el) => (el.textContent = '⌘'));
-}
-
-/* ---------- Toast ---------- */
-
-const toastEl = $('[data-toast]');
-let toastTimer = 0;
-
-function toast(message: string) {
-  if (!toastEl) return;
-  toastEl.textContent = message;
-  toastEl.classList.add('is-visible');
-  window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => toastEl.classList.remove('is-visible'), 2400);
-}
-
-async function copyText(text: string, message: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    const field = document.createElement('textarea');
-    field.value = text;
-    field.setAttribute('readonly', '');
-    field.style.position = 'fixed';
-    field.style.opacity = '0';
-    document.body.append(field);
-    field.select();
-    const ok = document.execCommand('copy');
-    field.remove();
-    if (!ok) {
-      toast(`Couldn’t copy — it’s ${text}`);
-      return false;
-    }
-  }
-  toast(message);
-  return true;
 }
 
 /* ---------- Theme ---------- */
@@ -188,11 +151,9 @@ function openPalette() {
 }
 
 function runCommand(item: HTMLElement) {
-  const { href, action, value } = item.dataset;
+  const { href, action } = item.dataset;
   palette?.close();
-  if (action === 'copy-email' && value) {
-    void copyText(value, 'Email address copied');
-  } else if (action === 'toggle-theme') {
+  if (action === 'toggle-theme') {
     toggleTheme();
   } else if (href) {
     if ('external' in item.dataset) window.open(href, '_blank', 'noopener');
@@ -345,15 +306,94 @@ $$('[data-progress]').forEach((bar) => {
   if (label) label.textContent = `${percent.toFixed(1)}%`;
 });
 
-$$<HTMLButtonElement>('[data-copy]').forEach((button) => {
-  button.addEventListener('click', async () => {
-    if (!(await copyText(button.dataset.copy ?? '', 'Email address copied'))) return;
-    button.dataset.copied = '';
-    window.setTimeout(() => delete button.dataset.copied, 2000);
-  });
+$$('[data-print]').forEach((button) => button.addEventListener('click', () => window.print()));
+
+/* ---------- Project type filters ---------- */
+
+$$('[data-filters]').forEach((filters) => {
+  const buttons = $$<HTMLButtonElement>('button[data-filter]', filters);
+  const status = $('[data-filter-status]');
+  const items = $$('[data-filter-scope] [data-type]');
+
+  const apply = (value: string) => {
+    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === value)));
+    items.forEach((item) => {
+      item.hidden = Boolean(value) && item.dataset.type !== value;
+    });
+    if (status) {
+      const visible = items.filter((item) => !item.hidden).length;
+      status.textContent = value ? `Showing ${visible} ${value.toLowerCase()} project${visible === 1 ? '' : 's'}` : '';
+    }
+  };
+
+  buttons.forEach((button) => button.addEventListener('click', () => apply(button.dataset.filter ?? '')));
 });
 
-$$('[data-print]').forEach((button) => button.addEventListener('click', () => window.print()));
+/* ---------- Contact form ---------- */
+
+$$<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+  const fields = $('[data-contact-fields]', form);
+  const sent = $('[data-contact-sent]', form);
+  const error = $('[data-contact-error]', form);
+  const label = $('[data-contact-label]', form);
+  const subject = $<HTMLInputElement>('[data-contact-subject]', form);
+  const idle = label?.textContent ?? 'Send message';
+
+  const show = (el: HTMLElement | null, visible: boolean) => {
+    if (el) el.hidden = !visible;
+  };
+
+  const busy = (on: boolean) => {
+    const button = $<HTMLButtonElement>('button[type="submit"]', form);
+    if (button) button.disabled = on;
+    if (label) label.textContent = on ? 'Sending…' : idle;
+  };
+
+  $$<HTMLButtonElement>('[data-topic]').forEach((button) => {
+    button.addEventListener('click', () => {
+      $$<HTMLButtonElement>('[data-topic]').forEach((other) => other.removeAttribute('aria-pressed'));
+      button.setAttribute('aria-pressed', 'true');
+      if (subject) subject.value = button.dataset.topic ?? '';
+      $<HTMLTextAreaElement>('textarea[name="message"]', form)?.focus();
+    });
+  });
+
+  $('[data-contact-reset]', form)?.addEventListener('click', () => {
+    form.reset();
+    show(sent, false);
+    show(fields, true);
+    $$<HTMLButtonElement>('[data-topic]').forEach((button) => button.removeAttribute('aria-pressed'));
+    $<HTMLInputElement>('input[name="name"]', form)?.focus();
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    show(error, false);
+    busy(true);
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const payload = (await response.json().catch(() => ({}))) as { success?: boolean; message?: string };
+      if (!response.ok || payload.success === false) throw new Error(payload.message ?? 'Send failed');
+      form.reset();
+      $$<HTMLButtonElement>('[data-topic]').forEach((button) => button.removeAttribute('aria-pressed'));
+      show(fields, false);
+      show(sent, true);
+      sent?.focus();
+    } catch {
+      show(error, true);
+    } finally {
+      busy(false);
+    }
+  });
+});
 
 /* ---------- Tabs ---------- */
 

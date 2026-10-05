@@ -1,6 +1,7 @@
 ---
 import Icon, { type IconName } from './Icon.astro';
-import { featuredProject, nav, profile } from '../data/site';
+import { nav, profile } from '../data/site';
+import { getProjects, isThisSite, primaryLink } from '../lib/projects';
 
 type Command = {
   id: string;
@@ -10,7 +11,7 @@ type Command = {
   keywords?: string;
   href?: string;
   external?: boolean;
-  action?: 'copy-email' | 'toggle-theme';
+  action?: 'toggle-theme';
 };
 
 const sectionIcons: Record<string, IconName> = {
@@ -18,43 +19,64 @@ const sectionIcons: Record<string, IconName> = {
   experience: 'briefcase',
   projects: 'layers',
   skills: 'cpu',
-  contact: 'mail',
+  contact: 'message',
 };
 
+const projects = await getProjects();
+const projectCommands: Command[] = projects.flatMap((project) => {
+  const { title, type, tags, demo } = project.data;
+  const href = primaryLink(project);
+  const keywords = `project ${tags.join(' ')}`;
+  const commands: Command[] = [];
+  if (demo && !isThisSite(project)) {
+    commands.push({
+      id: `demo-${project.id}`,
+      label: `Play the ${title} demo`,
+      hint: 'Opens in a new tab',
+      icon: 'play',
+      keywords: `${keywords} live demo try`,
+      href: demo,
+      external: true,
+    });
+  }
+  if (href) {
+    commands.push({
+      id: `project-${project.id}`,
+      label: title,
+      hint: project.data.caseStudy ? 'Case study' : type,
+      icon: 'folder',
+      keywords,
+      href,
+      external: href !== project.page,
+    });
+  }
+  return commands;
+});
+
 const groups: { label: string; items: Command[] }[] = [
-  {
-    label: 'Kilobyte',
-    items: [
-      {
-        id: 'kilobyte-demo',
-        label: 'Play the Kilobyte demo',
-        hint: 'Opens in a new tab',
-        icon: 'gamepad',
-        keywords: 'live demo games play arcade',
-        href: featuredProject.links.live,
-        external: true,
-      },
-      {
-        id: 'kilobyte-case-study',
-        label: 'Read the Kilobyte case study',
-        hint: 'Project',
-        icon: 'file-text',
-        keywords: 'project write-up how it works',
-        href: featuredProject.links.caseStudy,
-      },
-    ],
-  },
+  { label: 'Projects', items: projectCommands },
   {
     label: 'Go to',
     items: [
       { id: 'home', label: 'Home', hint: 'Page', icon: 'home', href: '/' },
-      ...nav.map((item) => ({
-        id: `section-${item.id}`,
-        label: item.label,
-        hint: 'Section',
-        icon: sectionIcons[item.id] ?? 'arrow-right',
-        href: `/#${item.id}`,
-      })),
+      {
+        id: 'all-projects',
+        label: 'All projects',
+        hint: 'Page',
+        icon: 'layers',
+        keywords: 'portfolio work',
+        href: '/projects/',
+      },
+      ...nav
+        .filter((item) => item.id !== 'projects')
+        .map((item) => ({
+          id: `section-${item.id}`,
+          label: item.label,
+          hint: 'Section',
+          icon: sectionIcons[item.id] ?? 'arrow-right',
+          keywords: item.id === 'contact' ? 'email message hire reach' : undefined,
+          href: `/#${item.id}`,
+        })),
       {
         id: 'education',
         label: 'Education',
@@ -77,12 +99,12 @@ const groups: { label: string; items: Command[] }[] = [
     label: 'Actions',
     items: [
       {
-        id: 'copy-email',
-        label: 'Copy email address',
-        hint: profile.email,
-        icon: 'copy',
-        keywords: 'contact mail clipboard',
-        action: 'copy-email',
+        id: 'message',
+        label: 'Send me a message',
+        hint: 'Contact form',
+        icon: 'send',
+        keywords: 'contact email mail hire reach',
+        href: '/#contact',
       },
       {
         id: 'toggle-theme',
@@ -111,16 +133,9 @@ const groups: { label: string; items: Command[] }[] = [
         label: 'LinkedIn',
         hint: 'Profile',
         icon: 'linkedin',
+        keywords: 'message connect',
         href: profile.links.linkedin,
         external: true,
-      },
-      {
-        id: 'email',
-        label: 'Send an email',
-        hint: 'Opens your mail app',
-        icon: 'mail',
-        keywords: 'contact hire',
-        href: `mailto:${profile.email}`,
       },
       {
         id: 'source',
@@ -174,7 +189,6 @@ const groups: { label: string; items: Command[] }[] = [
                 data-href={item.href}
                 data-external={item.external ? '' : undefined}
                 data-action={item.action}
-                data-value={item.action === 'copy-email' ? profile.email : undefined}
               >
                 <span class="palette-item-icon">
                   <Icon name={item.icon} size={16} />
@@ -187,7 +201,7 @@ const groups: { label: string; items: Command[] }[] = [
           </div>
         ))
       }
-      <p class="palette-empty" data-palette-empty hidden>No matches. Try “resume”, “Kilobyte”, or “email”.</p>
+      <p class="palette-empty" data-palette-empty hidden>No matches. Try “resume”, “Kilobyte”, or “contact”.</p>
     </div>
 
     <div class="palette-foot" aria-hidden="true">
@@ -281,10 +295,6 @@ const groups: { label: string; items: Command[] }[] = [
     margin-top: 0.35rem;
   }
 
-  .palette-group[hidden] {
-    display: none;
-  }
-
   .palette-group-label {
     padding: 0.6rem 0.75rem 0.35rem;
     color: var(--text-3);
@@ -303,10 +313,6 @@ const groups: { label: string; items: Command[] }[] = [
     color: var(--text-2);
     cursor: pointer;
     scroll-margin: 0.5rem;
-  }
-
-  .palette-item[hidden] {
-    display: none;
   }
 
   .palette-item[aria-selected='true'] {

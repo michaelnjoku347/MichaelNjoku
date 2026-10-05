@@ -1,16 +1,23 @@
 ---
+// Kilobyte's hand-built case study. The title, summary, stats, links, and the
+// intro paragraph come from src/content/projects/kilobyte.md.
 import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BrowserFrame from '../../components/BrowserFrame.astro';
 import Icon, { type IconName } from '../../components/Icon.astro';
-import { featuredProject as kilobyte } from '../../data/site';
-import findShot from '../../assets/kilobyte/search.webp';
-import catalogShot from '../../assets/kilobyte/catalog.webp';
-import playShot from '../../assets/kilobyte/play.webp';
-import publishShot from '../../assets/kilobyte/publish.webp';
-import hostingShot from '../../assets/kilobyte/hosting.webp';
+import findShot from '../../content/projects/images/kilobyte/search.webp';
+import catalogShot from '../../content/projects/images/kilobyte/catalog.webp';
+import playShot from '../../content/projects/images/kilobyte/play.webp';
+import publishShot from '../../content/projects/images/kilobyte/publish.webp';
+import hostingShot from '../../content/projects/images/kilobyte/hosting.webp';
 
-const demo = kilobyte.links.live ?? '/kilobyte/';
+const entry = await getEntry('projects', 'kilobyte');
+if (!entry) throw new Error('src/content/projects/kilobyte.md is missing.');
+const kilobyte = entry.data;
+const { Content: Intro } = await render(entry);
+const demo = kilobyte.demo ?? '/kilobyte/';
+const repo = kilobyte.repo ?? 'https://github.com/michaelnjoku347/KiloByte';
 
 const tour = [
   {
@@ -94,7 +101,7 @@ const internals = [
   },
   {
     title: 'Checked on every push',
-    body: '17 Vitest unit tests, a Puppeteer smoke test, and oxlint, with GitHub Actions linting, testing, and building each change.',
+    body: 'GitHub Actions runs oxlint, 17 Vitest unit tests, and a production build on each change, and a Puppeteer smoke test clicks through the real app.',
   },
 ];
 ---
@@ -108,21 +115,21 @@ const internals = [
       <div class="study-hero-bg" aria-hidden="true"></div>
       <div class="container">
         <nav class="crumbs" aria-label="Breadcrumb">
-          <a href="/#projects"><Icon name="arrow-left" size={16} />All projects</a>
+          <a href="/projects/"><Icon name="arrow-left" size={16} />All projects</a>
         </nav>
-        <p class="eyebrow" data-reveal>Case study · {kilobyte.kind} · {kilobyte.year}</p>
+        <p class="eyebrow" data-reveal>Case study · {kilobyte.type} · {kilobyte.year}</p>
         <h1 data-reveal style="--reveal-delay: 1">
-          {kilobyte.name}<span class="live-badge"><span class="led" aria-hidden="true"></span>Live</span>
+          {kilobyte.title}<span class="live-badge"><span class="led" aria-hidden="true"></span>Live</span>
         </h1>
-        <p class="study-tagline" data-reveal style="--reveal-delay: 2">{kilobyte.tagline}</p>
-        <p class="study-summary" data-reveal style="--reveal-delay: 3">{kilobyte.summary}</p>
+        <p class="study-tagline" data-reveal style="--reveal-delay: 2">{kilobyte.summary}</p>
+        <div class="study-summary" data-reveal style="--reveal-delay: 3"><Intro /></div>
         <div class="study-actions" data-reveal style="--reveal-delay: 4">
           <a class="btn btn-primary btn-lg" href={demo} target="_blank" rel="noopener">
             <Icon name="gamepad" />
             Play the live demo
-            <span class="sr-only">(opens in a new tab)</span>
+            <span class="sr-only"> (opens in a new tab)</span>
           </a>
-          <a class="btn btn-lg" href={kilobyte.links.repo} target="_blank" rel="noopener">
+          <a class="btn btn-lg" href={repo} target="_blank" rel="noopener">
             <Icon name="github" />
             View the code
           </a>
@@ -154,7 +161,7 @@ const internals = [
           <div class="demo-stage" data-demo={demo} data-demo-title="Kilobyte live demo">
             <Image
               class="demo-poster"
-              src={findShot}
+              src={playShot}
               alt=""
               widths={[960, 1440, 1920]}
               sizes="(min-width: 1180px) 1160px, 100vw"
@@ -297,7 +304,7 @@ const internals = [
         }
       </div>
       <ul class="tags study-stack" aria-label="Full stack" data-reveal>
-        {kilobyte.stack.map((tech) => <li class="tag">{tech}</li>)}
+        {kilobyte.tags.map((tech) => <li class="tag">{tech}</li>)}
       </ul>
     </section>
 
@@ -311,9 +318,9 @@ const internals = [
             <a class="btn btn-primary" href={demo} target="_blank" rel="noopener">
               <Icon name="gamepad" />
               Play the live demo
-              <span class="sr-only">(opens in a new tab)</span>
+              <span class="sr-only"> (opens in a new tab)</span>
             </a>
-            <a class="btn" href={kilobyte.links.repo} target="_blank" rel="noopener">
+            <a class="btn" href={repo} target="_blank" rel="noopener">
               <Icon name="github" />
               michaelnjoku347/KiloByte
             </a>
@@ -326,7 +333,7 @@ const internals = [
       </div>
 
       <nav class="study-next" aria-label="More">
-        <a href="/#projects"><Icon name="arrow-left" size={18} />Back to all projects</a>
+        <a href="/projects/"><Icon name="arrow-left" size={18} />Back to all projects</a>
         <a href="/resume/">See my résumé<Icon name="arrow-right" size={18} /></a>
       </nav>
     </section>
@@ -349,21 +356,6 @@ const internals = [
       radial-gradient(circle, var(--dot) 1px, transparent 1.3px) 0 0 / 22px 22px;
     -webkit-mask-image: linear-gradient(#000 30%, transparent);
     mask-image: linear-gradient(#000 30%, transparent);
-  }
-
-  .crumbs a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    color: var(--text-2);
-    font-size: var(--step--1);
-    font-weight: 500;
-    text-decoration: none;
-  }
-
-  .crumbs a:hover {
-    color: var(--text);
   }
 
   .study-hero h1 {
@@ -723,7 +715,7 @@ const internals = [
 
   .run {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
     gap: clamp(1.5rem, 4vw, 3rem);
     align-items: center;
     padding: clamp(1.5rem, 5vw, 3rem);
@@ -749,17 +741,17 @@ const internals = [
     margin: 0;
     padding: 1.4rem 1.5rem;
     overflow-x: auto;
-    border: 1px solid var(--pcb-edge);
+    border: 1px solid var(--code-line);
     border-radius: var(--radius);
-    background: var(--pcb-bg);
-    color: #d9e6df;
+    background: var(--code-bg);
+    color: var(--code-text);
     font-family: var(--font-mono);
     font-size: var(--step--1);
     line-height: 1.9;
   }
 
   .prompt {
-    color: #46f59a;
+    color: var(--code-prompt);
     user-select: none;
   }
 

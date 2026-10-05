@@ -1,0 +1,98 @@
+---
+import Icon from './Icon.astro';
+import ProjectCard from './ProjectCard.astro';
+import { profile } from '../data/site';
+import type { Project } from '../lib/projects';
+
+interface Props {
+  projects: Project[];
+}
+
+const { projects } = Astro.props;
+---
+
+<ul class="project-grid">
+  {
+    projects.map((project, i) => (
+      <li data-type={project.data.type} data-reveal style={`--reveal-delay: ${i % 3}`}>
+        <ProjectCard project={project} />
+      </li>
+    ))
+  }
+  <li data-reveal style={`--reveal-delay: ${projects.length % 3}`}>
+    <a class="github-card" href={profile.links.github} target="_blank" rel="me noopener">
+      <span class="github-icon"><Icon name="github" size={26} /></span>
+      <strong>More on GitHub</strong>
+      <span>Coursework, experiments, and works in progress.</span>
+      <span class="github-handle mono">
+        @{profile.links.githubHandle}
+        <Icon name="arrow-up-right" size={14} />
+      </span>
+      <span class="sr-only"> (opens in a new tab)</span>
+    </a>
+  </li>
+</ul>
+
+<style>
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+    list-style: none;
+  }
+
+  .github-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    height: 100%;
+    min-height: 18rem;
+    padding: 2rem 1.5rem;
+    border: 1.5px dashed var(--line-2);
+    border-radius: var(--radius-lg);
+    color: var(--text-2);
+    text-align: center;
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      background-color 0.3s,
+      color 0.3s;
+  }
+
+  .github-card:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  .github-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 0.4rem;
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .github-card strong {
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    letter-spacing: -0.02em;
+  }
+
+  .github-handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+    color: var(--accent-text);
+    font-size: var(--step--1);
+  }
+</style>

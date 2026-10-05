@@ -1,0 +1,53 @@
+---
+// Web3Forms sends visitors here after they submit the contact form with
+// JavaScript turned off. With JavaScript on, the form confirms in place.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+---
+
+<BaseLayout title="Message sent" description="Thanks for your message." noindex>
+  <section class="container thanks">
+    <span class="thanks-icon"><Icon name="check" size={30} /></span>
+    <h1>Thanks, your message is on its way.</h1>
+    <p class="section-lede">I’ll get back to you soon.</p>
+    <div class="thanks-actions">
+      <a class="btn btn-primary" href="/"><Icon name="home" />Back home</a>
+      <a class="btn" href="/projects/"><Icon name="layers" />See my projects</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .thanks {
+    display: grid;
+    justify-items: center;
+    gap: 1.1rem;
+    padding-block: clamp(4rem, 12vw, 8rem);
+    text-align: center;
+  }
+
+  .thanks-icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--led) 12%, transparent);
+    color: var(--led);
+  }
+
+  .thanks h1 {
+    max-width: 18ch;
+    font-size: var(--step-4);
+    letter-spacing: -0.04em;
+  }
+
+  .thanks-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>

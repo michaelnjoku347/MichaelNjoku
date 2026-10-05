@@ -1,0 +1,318 @@
+---
+import { Image } from 'astro:assets';
+import BrowserFrame from './BrowserFrame.astro';
+import Icon from './Icon.astro';
+import ProjectCover from './ProjectCover.astro';
+import { demoAddress, isThisSite, type Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, summary, year, type, tags, cover, coverAlt, demo, demoLabel, repo, stats, caseStudy, draft } =
+  project.data;
+const liveDemo = demo && !isThisSite(project) ? demo : undefined;
+const coverHref = liveDemo ?? project.page ?? repo;
+const demoText = demoLabel ?? 'Open the live demo';
+const headingId = `project-${project.id}-title`;
+const newTab = { target: '_blank', rel: 'noopener' };
+const Cover = coverHref ? 'a' : 'div';
+const coverLink = coverHref
+  ? {
+      href: coverHref,
+      ...(liveDemo || coverHref === repo ? newTab : {}),
+      ...(!liveDemo ? { tabindex: -1, 'aria-hidden': true as const } : {}),
+    }
+  : {};
+---
+
+<article class="feature card" aria-labelledby={headingId} data-type={type} data-reveal>
+  <Cover class="feature-shot" {...coverLink}>
+    {
+      cover ? (
+        <BrowserFrame address={demoAddress(coverHref ?? '/')} live={Boolean(liveDemo)}>
+          <Image
+            src={cover}
+            alt={liveDemo ? (coverAlt ?? `${title} screenshot`) : ''}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 1180px) 620px, (min-width: 1080px) 52vw, 100vw"
+            loading="lazy"
+          />
+        </BrowserFrame>
+      ) : (
+        <ProjectCover title={title} tags={tags} class="feature-cover" />
+      )
+    }
+    {
+      liveDemo && (
+        <span class="feature-play">
+          <Icon name="play" />
+          {demoText}
+          <span class="sr-only"> (opens in a new tab)</span>
+        </span>
+      )
+    }
+  </Cover>
+
+  <div class="feature-body">
+    <p class="eyebrow">
+      Featured · {type} · {year}
+      {draft && <span class="draft">Draft</span>}
+    </p>
+    <h3 id={headingId} class="feature-title">
+      {project.page ? <a href={project.page}>{title}</a> : title}
+      {
+        liveDemo && (
+          <span class="live-badge">
+            <span class="led" aria-hidden="true" />
+            Live demo
+          </span>
+        )
+      }
+    </h3>
+    <p class="feature-summary">{summary}</p>
+    {
+      stats && (
+        <dl class="feature-stats">
+          {stats.map((stat) => (
+            <div>
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+    {
+      tags.length > 0 && (
+        <ul class="tags" aria-label="Built with">
+          {tags.slice(0, 7).map((tag) => (
+            <li class="tag">{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+    <div class="feature-actions">
+      {
+        liveDemo && (
+          <a class="btn btn-primary" href={liveDemo} {...newTab}>
+            <Icon name="play" />
+            {demoText}
+            <span class="sr-only"> (opens in a new tab)</span>
+          </a>
+        )
+      }
+      {
+        project.page && (
+          <a class="btn" href={project.page}>
+            {caseStudy ? 'Case study' : 'Project details'}
+            <Icon name="arrow-right" />
+          </a>
+        )
+      }
+      {
+        repo && (
+          <a class="btn btn-ghost" href={repo} {...newTab}>
+            <Icon name="github" />
+            Code
+          </a>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    padding: clamp(0.85rem, 2vw, 1.25rem);
+    overflow: hidden;
+    border-color: var(--accent-line);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(50rem 30rem at 0% 0%, var(--glow), transparent 60%),
+      linear-gradient(180deg, var(--surface), var(--surface-2));
+  }
+
+  .feature + :global(.feature) {
+    margin-top: 1.25rem;
+  }
+
+  .feature-shot {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-lg);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .feature-shot :global(.browser),
+  .feature-shot :global(.feature-cover) {
+    transition:
+      transform 0.6s var(--ease-out),
+      box-shadow 0.6s var(--ease-out);
+  }
+
+  .feature-shot :global(.feature-cover) {
+    border-radius: var(--radius-lg);
+  }
+
+  .feature-shot:hover :global(.browser),
+  .feature-shot:focus-visible :global(.browser),
+  .feature-shot:hover :global(.feature-cover) {
+    transform: translateY(-4px) rotate(-0.4deg);
+    box-shadow:
+      0 0 0 1px var(--accent-line),
+      var(--shadow-lg);
+  }
+
+  .feature-shot :global(.browser-view)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgb(5 6 8 / 0.55));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .feature-shot:hover :global(.browser-view)::after,
+  .feature-shot:focus-visible :global(.browser-view)::after {
+    opacity: 1;
+  }
+
+  .feature-play {
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7);
+    color: var(--accent-ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+    white-space: nowrap;
+    transform: translate(-50%, 0);
+    transition:
+      transform 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out);
+  }
+
+  .feature-play :global(svg) {
+    width: 1em;
+    height: 1em;
+  }
+
+  .feature-shot:hover .feature-play,
+  .feature-shot:focus-visible .feature-play {
+    transform: translate(-50%, -6px) scale(1.04);
+    box-shadow: 0 22px 44px -10px rgb(255 160 30 / 0.55);
+  }
+
+  .feature-body {
+    padding: clamp(0.5rem, 2vw, 1.25rem) clamp(0.5rem, 2vw, 1.5rem) clamp(0.5rem, 2vw, 1.25rem) 0;
+  }
+
+  .draft {
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.45rem;
+    border: 1px dashed currentColor;
+    border-radius: 6px;
+  }
+
+  .feature-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.8rem;
+    font-size: var(--step-4);
+  }
+
+  .feature-title a {
+    text-decoration: none;
+  }
+
+  .feature-title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-line);
+    text-decoration-thickness: 3px;
+  }
+
+  .feature-summary {
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .feature-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .feature-stats div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    padding: 0.8rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  .feature-stats dt {
+    margin-top: 0.35rem;
+    color: var(--text-3);
+    font-size: var(--step--2);
+    line-height: 1.35;
+  }
+
+  .feature-stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .feature-summary + .tags {
+    margin-top: 1.5rem;
+  }
+
+  .feature-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.6rem;
+  }
+
+  @media (max-width: 1080px) {
+    .feature {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .feature-body {
+      padding: 0.25rem clamp(0.5rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1rem);
+    }
+  }
+
+  @media (max-width: 680px) {
+    .feature-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

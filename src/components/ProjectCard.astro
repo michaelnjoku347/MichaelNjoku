@@ -1,0 +1,223 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import ProjectCover from './ProjectCover.astro';
+import { profile } from '../data/site';
+import { isThisSite, primaryLink, type Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, summary, year, type, tags, cover, demo, repo, draft } = project.data;
+const href = primaryLink(project);
+const newTab = href && href !== project.page ? { target: '_blank', rel: 'noopener' } : {};
+const liveDemo = demo && !isThisSite(project) ? demo : undefined;
+const shownTags = tags.slice(0, 4);
+const moreTags = tags.length - shownTags.length;
+const Cover = href ? 'a' : 'div';
+// The cover repeats the title link, so it stays out of the tab order.
+const coverLink = href ? { href, tabindex: -1, 'aria-hidden': 'true', ...newTab } : {};
+---
+
+<article class="project card spotlight">
+  <Cover class="project-cover" {...coverLink}>
+    {
+      cover ? (
+        <Image
+          src={cover}
+          alt=""
+          widths={[400, 640, 800]}
+          sizes="(min-width: 1180px) 370px, (min-width: 720px) 45vw, 100vw"
+          loading="lazy"
+        />
+      ) : (
+        <ProjectCover title={title} tags={tags} />
+      )
+    }
+  </Cover>
+
+  <div class="project-body">
+    <p class="project-meta mono">
+      {type} · {year}
+      {draft && <span class="draft">Draft</span>}
+    </p>
+    <h3>
+      {
+        href ? (
+          <a href={href} {...newTab}>
+            {title}
+            {newTab.target && <span class="sr-only"> (opens in a new tab)</span>}
+          </a>
+        ) : (
+          title
+        )
+      }
+    </h3>
+    <p class="project-summary">{summary}</p>
+    {
+      shownTags.length > 0 && (
+        <ul class="tags" aria-label="Built with">
+          {shownTags.map((tag) => (
+            <li class="tag">{tag}</li>
+          ))}
+          {moreTags > 0 && <li class="tag tag-more">+{moreTags}</li>}
+        </ul>
+      )
+    }
+    <div class="project-links">
+      {
+        isThisSite(project) ? (
+          <span class="project-here">
+            <span class="led" aria-hidden="true" />
+            You’re here
+          </span>
+        ) : (
+          liveDemo && (
+            <a href={liveDemo} target="_blank" rel="noopener">
+              Live demo <Icon name="arrow-up-right" size={15} />
+            </a>
+          )
+        )
+      }
+      {
+        repo && (
+          <a href={repo} target="_blank" rel="noopener">
+            <Icon name="github" size={15} />
+            {repo === profile.links.github ? 'GitHub profile' : 'Code'}
+          </a>
+        )
+      }
+      {
+        project.page && (
+          <a class="project-more" href={project.page}>
+            Details <Icon name="arrow-right" size={15} />
+          </a>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  .project {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    transition:
+      transform 0.4s var(--ease-out),
+      border-color 0.3s,
+      box-shadow 0.4s var(--ease-out);
+  }
+
+  .project:hover {
+    transform: translateY(-3px);
+    border-color: var(--line-2);
+    box-shadow: var(--shadow);
+  }
+
+  .project-cover {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: #0f1115;
+  }
+
+  .project-cover > :global(*) {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .project-cover :global(img) {
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .project:hover .project-cover > :global(*) {
+    transform: scale(1.035);
+  }
+
+  .project-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.25rem 1.35rem 1.35rem;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.06em;
+  }
+
+  .draft {
+    padding: 0.05rem 0.4rem;
+    border: 1px dashed currentColor;
+    border-radius: 6px;
+  }
+
+  .project h3 {
+    margin-top: 0.6rem;
+    font-size: var(--step-2);
+  }
+
+  .project h3 a {
+    text-decoration: none;
+  }
+
+  .project h3 a:hover {
+    color: var(--accent-text);
+  }
+
+  .project-summary {
+    margin-top: 0.5rem;
+    margin-bottom: 1.1rem;
+    color: var(--text-2);
+  }
+
+  .tag-more {
+    color: var(--text-3);
+  }
+
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.15rem;
+    margin-top: auto;
+    padding-top: 1.1rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+
+  .project-links a:hover {
+    color: var(--accent-text);
+  }
+
+  .project-links .project-more {
+    margin-left: auto;
+    color: var(--accent-text);
+  }
+
+  .project-here {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--text-2);
+  }
+</style>

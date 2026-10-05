@@ -1,0 +1,1431 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrowserFrame from '../components/BrowserFrame.astro';
+import Chip from '../components/Chip.astro';
+import Icon, { type IconName } from '../components/Icon.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import kilobyteShot from '../assets/kilobyte/search.webp';
+import {
+  askMeAbout,
+  education,
+  experience,
+  featuredProject as kilobyte,
+  interests,
+  profile,
+  projects,
+  skills,
+} from '../data/site';
+
+const current = experience.find((job) => job.current);
+const start = Date.parse(education.started);
+const end = Date.parse(education.graduates);
+const progress = Math.min(100, Math.max(0, ((Date.now() - start) / (end - start)) * 100));
+
+const interestIcons: IconName[] = ['cpu', 'zap', 'users'];
+const projectIcons: Record<string, IconName> = { 'njoku-dev': 'globe', practice: 'terminal' };
+const askSubject = (topic: string) =>
+  `Asking about ${topic.replace(/^My\b/, 'your').replace(/^Whatever/, 'whatever')}`;
+const mailto = (subject?: string) =>
+  `mailto:${profile.email}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`;
+const when = (job: (typeof experience)[number]) => (job.start === job.end ? job.start : `${job.start} – ${job.end}`);
+---
+
+<BaseLayout>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="status-pill" data-reveal>
+          <span class="led" aria-hidden="true"></span>
+          {profile.status}
+        </p>
+        <p class="hero-kicker mono" data-reveal style="--reveal-delay: 1">Hi, I’m {profile.name}</p>
+        <h1 id="hero-title" data-reveal style="--reveal-delay: 2">
+          I build where <span class="gradient-text">hardware</span> meets <span class="gradient-text">software</span>.
+        </h1>
+        <p class="hero-lede" data-reveal style="--reveal-delay: 3">
+          Computer Science student at {education.school}, intern at {current?.company}, and the developer behind
+          <a href={kilobyte.links.caseStudy}>Kilobyte</a>, a browser-game catalog that never hosts the games.
+        </p>
+        <div class="hero-ctas" data-reveal style="--reveal-delay: 4">
+          <a class="btn btn-primary btn-lg" href={kilobyte.links.live} target="_blank" rel="noopener">
+            <Icon name="gamepad" />
+            Play the Kilobyte demo
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+          <a class="btn btn-lg" href="#projects">
+            See my work
+            <Icon name="arrow-down" />
+          </a>
+        </div>
+        <ul class="hero-meta" data-reveal style="--reveal-delay: 5">
+          <li><Icon name="map-pin" size={16} />{profile.location}</li>
+          <li><Icon name="graduation-cap" size={16} />{education.shortDegree} · ’29</li>
+          <li>
+            <a href={profile.links.github} target="_blank" rel="me noopener"><Icon name="github" size={16} />GitHub</a>
+          </li>
+          <li>
+            <a href={profile.links.linkedin} target="_blank" rel="me noopener"
+              ><Icon name="linkedin" size={16} />LinkedIn</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="hero-visual" data-tilt-area data-reveal style="--reveal-delay: 2">
+        <Chip />
+        <p class="hero-caption mono" aria-hidden="true">fig. 1 — eight pins, one student</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <dl class="glance" data-reveal>
+      <div>
+        <dt><span class="led" aria-hidden="true"></span>Now</dt>
+        <dd>{current?.role} at {current?.company}</dd>
+      </div>
+      <div>
+        <dt>Building</dt>
+        <dd><a href={kilobyte.links.caseStudy}>Kilobyte</a>, a browser-game catalog</dd>
+      </div>
+      <div>
+        <dt>Studying</dt>
+        <dd>{education.shortDegree} · FSC ’29</dd>
+      </div>
+      <div>
+        <dt>Local time</dt>
+        <dd><span data-clock={profile.timeZone}>Eastern Time</span> · Freeport, NY</dd>
+      </div>
+    </dl>
+  </div>
+
+  <section class="section" id="about" aria-labelledby="about-title">
+    <div class="container">
+      <SectionHeading id="about-title" index="01" label="About">From logic gates to game loops.</SectionHeading>
+      <div class="about-grid">
+        <div class="about-copy" data-reveal>
+          {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+          <ul class="interests">
+            {
+              interests.map((interest, i) => (
+                <li>
+                  <span class="interest-icon">
+                    <Icon name={interestIcons[i] ?? 'zap'} size={17} />
+                  </span>
+                  {interest}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <dl class="facts" data-reveal style="--reveal-delay: 2">
+          <div class="fact card">
+            <dt>Based in</dt>
+            <dd>{profile.location}</dd>
+          </div>
+          <div class="fact card">
+            <dt>Class of</dt>
+            <dd>2029</dd>
+          </div>
+          <div class="fact card fact-wide">
+            <dt>Studying</dt>
+            <dd>
+              {education.degree}
+              <span>{education.school}</span>
+            </dd>
+          </div>
+          <div class="fact card">
+            <dt>Clubs</dt>
+            <dd>AI · Cyber Security</dd>
+          </div>
+          <div class="fact card">
+            <dt>Speaks</dt>
+            <dd>English · Spanish</dd>
+          </div>
+          <div class="fact card fact-wide fact-motto">
+            <dt>Favorite phrase</dt>
+            <dd>“{profile.motto}”</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="experience" aria-labelledby="experience-title">
+    <div class="container">
+      <SectionHeading
+        id="experience-title"
+        index="02"
+        label="Experience"
+        lede="Startups, retail, and team leadership: each one taught me how to communicate, adapt fast, and get things done with people."
+      >
+        Learning on the job.
+      </SectionHeading>
+
+      <ol class="timeline">
+        {
+          experience.map((job) => (
+            <li class="job" data-reveal>
+              <div class="job-rail" aria-hidden="true">
+                <span class:list={['job-pad', { 'is-current': job.current }]} />
+              </div>
+              <article class="job-card card spotlight">
+                <header class="job-head">
+                  <div>
+                    <h3>
+                      {job.role} <span class="job-at">· {job.company}</span>
+                    </h3>
+                    <p class="job-summary">{job.summary}</p>
+                  </div>
+                  <p class="job-when mono">
+                    {when(job)}
+                    <span>{job.location}</span>
+                  </p>
+                </header>
+                {job.current && (
+                  <p class="job-now">
+                    <span class="led" aria-hidden="true" />
+                    Current role
+                  </p>
+                )}
+                <ul class="job-points">
+                  {job.highlights.map((point) => (
+                    <li>{point}</li>
+                  ))}
+                </ul>
+              </article>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="projects" aria-labelledby="projects-title">
+    <div class="container">
+      <SectionHeading
+        id="projects-title"
+        index="03"
+        label="Projects"
+        lede="Things I’ve built and shipped. Click Kilobyte to play the live demo right in your browser."
+      >
+        Built to be used, not just graded.
+      </SectionHeading>
+
+      <article class="feature card" aria-labelledby="kilobyte-title" data-reveal>
+        <a class="feature-shot" href={kilobyte.links.live} target="_blank" rel="noopener">
+          <BrowserFrame address="njoku.dev/kilobyte" live>
+            <Image
+              src={kilobyteShot}
+              alt="Kilobyte’s Find a game screen: a grid of colorful game covers such as Dock Ledger, 2048, Void Line, and Star Nibbler, each with a star rating and Play and Save buttons."
+              widths={[640, 960, 1280, 1600]}
+              sizes="(min-width: 1180px) 620px, (min-width: 960px) 52vw, 100vw"
+              loading="lazy"
+            />
+          </BrowserFrame>
+          <span class="feature-play">
+            <Icon name="gamepad" />
+            Play the live demo
+            <span class="sr-only">(opens in a new tab)</span>
+          </span>
+        </a>
+
+        <div class="feature-body">
+          <p class="eyebrow">Featured project · {kilobyte.year}</p>
+          <h3 id="kilobyte-title">
+            {kilobyte.name}
+            <span class="live-badge"><span class="led" aria-hidden="true"></span>Live demo</span>
+          </h3>
+          <p class="feature-tagline">{kilobyte.tagline}</p>
+          <p class="feature-summary">{kilobyte.summary}</p>
+          {
+            kilobyte.stats && (
+              <dl class="feature-stats">
+                {kilobyte.stats.map((stat) => (
+                  <div>
+                    <dt>{stat.label}</dt>
+                    <dd>{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )
+          }
+          <ul class="tags" aria-label="Built with">
+            {kilobyte.stack.slice(0, 7).map((tech) => <li class="tag">{tech}</li>)}
+          </ul>
+          <div class="feature-actions">
+            <a class="btn btn-primary" href={kilobyte.links.live} target="_blank" rel="noopener">
+              <Icon name="gamepad" />
+              Play the demo
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+            <a class="btn" href={kilobyte.links.caseStudy}>
+              Case study
+              <Icon name="arrow-right" />
+            </a>
+            <a class="btn btn-ghost" href={kilobyte.links.repo} target="_blank" rel="noopener">
+              <Icon name="github" />
+              Code
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <div class="project-grid">
+        {
+          projects.map((project, i) => (
+            <article class="project card spotlight" data-reveal style={`--reveal-delay: ${i + 1}`}>
+              <div class="project-top">
+                <span class="project-icon">
+                  <Icon name={projectIcons[project.slug] ?? 'box'} size={20} />
+                </span>
+                <span class="project-meta mono">
+                  {project.kind} · {project.year}
+                </span>
+              </div>
+              <h3>{project.name}</h3>
+              <p class="project-tagline">{project.tagline}</p>
+              <p class="project-summary">{project.summary}</p>
+              <ul class="tags" aria-label="Built with">
+                {project.stack.map((tech) => (
+                  <li class="tag">{tech}</li>
+                ))}
+              </ul>
+              <div class="project-links">
+                {project.links.live === profile.site ? (
+                  <span class="project-here">
+                    <span class="led" aria-hidden="true" />
+                    You’re looking at it
+                  </span>
+                ) : (
+                  project.links.live && (
+                    <a href={project.links.live} target="_blank" rel="noopener">
+                      Visit <Icon name="arrow-up-right" size={15} />
+                    </a>
+                  )
+                )}
+                {project.links.repo && (
+                  <a href={project.links.repo} target="_blank" rel="noopener">
+                    <Icon name="github" size={15} /> {project.links.repo === profile.links.github ? 'GitHub profile' : 'Source'}
+                  </a>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="skills" aria-labelledby="skills-title">
+    <div class="container">
+      <SectionHeading
+        id="skills-title"
+        index="04"
+        label="Skills"
+        lede="Languages and tools I use, the hardware I troubleshoot, and the soft skills that hold a team together."
+      >
+        A toolkit that spans the stack.
+      </SectionHeading>
+      <div class="skills-grid">
+        {
+          skills.map((group, i) => (
+            <article class="skill card spotlight" data-reveal style={`--reveal-delay: ${i % 3}`}>
+              <div class="skill-head">
+                <span class="skill-icon">
+                  <Icon name={group.icon} size={18} />
+                </span>
+                <h3>{group.title}</h3>
+              </div>
+              <ul class="tags">
+                {group.items.map((item) => (
+                  <li class="tag">{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="education" aria-labelledby="education-title">
+    <div class="container">
+      <SectionHeading id="education-title" index="05" label="Education">
+        Learning the machine from the transistor up.
+      </SectionHeading>
+      <div class="edu-grid">
+        <article class="edu card" data-reveal>
+          <div class="edu-head">
+            <span class="edu-icon"><Icon name="graduation-cap" size={22} /></span>
+            <div>
+              <h3>{education.school}</h3>
+              <p>{education.degree}</p>
+            </div>
+          </div>
+          <p class="edu-when mono">{education.location} · {education.graduationLabel}</p>
+          <div class="terminal">
+            <p><span class="prompt">~/fsc $</span> make bs-computer-science</p>
+            <div
+              class="progress"
+              role="progressbar"
+              aria-label="Degree progress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={progress.toFixed(0)}
+              data-progress
+              data-start={education.started}
+              data-end={education.graduates}
+              style={`--progress: ${progress}%`}
+            >
+              <span></span>
+            </div>
+            <p class="terminal-dim">
+              <span data-progress-label>{progress.toFixed(1)}%</span> compiled · target: May 2029
+            </p>
+          </div>
+        </article>
+
+        <article class="card coursework" data-reveal style="--reveal-delay: 1">
+          <h3>Relevant coursework</h3>
+          <ul class="course-list">
+            {
+              education.coursework.map((course) => (
+                <li>
+                  <Icon name="check" size={16} />
+                  {course}
+                </li>
+              ))
+            }
+          </ul>
+          <h3>Clubs</h3>
+          <ul class="tags">
+            {education.clubs.map((club) => <li class="tag">{club}</li>)}
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <div class="contact-card" data-reveal>
+        <div class="contact-bg" aria-hidden="true"></div>
+        <p class="eyebrow"><span class="eyebrow-index">06</span>Contact</p>
+        <h2 id="contact-title">Let’s build something <span class="gradient-text">together</span>.</h2>
+        <p class="section-lede">
+          I’m open to internships and entry-level roles, and always happy to talk code, hardware, or startups.
+        </p>
+
+        <div class="email-row">
+          <a class="email-link mono" href={mailto()}>{profile.email}</a>
+          <button class="btn btn-small copy-btn" type="button" data-copy={profile.email}>
+            <Icon name="copy" size={15} class="copy-idle" />
+            <Icon name="check" size={15} class="copy-done" />
+            <span class="copy-idle">Copy</span>
+            <span class="copy-done">Copied</span>
+          </button>
+        </div>
+
+        <div class="contact-actions">
+          <a class="btn btn-primary btn-lg" href={mailto('Hello from njoku.dev')}>
+            <Icon name="mail" />
+            Say hello
+          </a>
+          <a class="btn btn-lg" href={profile.links.linkedin} target="_blank" rel="me noopener">
+            <Icon name="linkedin" />
+            LinkedIn
+          </a>
+          <a class="btn btn-lg" href={profile.links.github} target="_blank" rel="me noopener">
+            <Icon name="github" />
+            GitHub
+          </a>
+        </div>
+
+        <div class="ask">
+          <p class="ask-title mono">Ask me about</p>
+          <ul class="ask-list">
+            {
+              askMeAbout.map((topic) => (
+                <li>
+                  <a href={mailto(askSubject(topic))}>{topic}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: calc(-1 * var(--header-h)) 0 0;
+    background:
+      radial-gradient(38rem 26rem at 78% 34%, var(--glow), transparent 70%),
+      radial-gradient(circle, var(--dot) 1px, transparent 1.3px) 0 0 / 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 85% 75% at 55% 35%, #000 35%, transparent 80%);
+    mask-image: radial-gradient(ellipse 85% 75% at 55% 35%, #000 35%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.42rem 0.9rem 0.42rem 0.8rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  .hero-kicker {
+    margin-top: 1.75rem;
+    color: var(--accent-text);
+    font-size: var(--step--1);
+    letter-spacing: 0.02em;
+  }
+
+  .hero h1 {
+    margin-top: 0.7rem;
+    font-size: var(--step-5);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .hero-lede {
+    max-width: 35rem;
+    margin-top: 1.5rem;
+    color: var(--text-2);
+    font-size: var(--step-1);
+    line-height: 1.6;
+  }
+
+  .hero-lede a {
+    color: var(--text);
+    text-decoration-color: var(--accent-line);
+  }
+
+  .hero-lede a:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.4rem;
+    margin-top: 2rem;
+    color: var(--text-3);
+    font-size: var(--step--1);
+    list-style: none;
+  }
+
+  .hero-meta li,
+  .hero-meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .hero-meta a {
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .hero-meta a:hover {
+    color: var(--text);
+  }
+
+  .hero-visual {
+    position: relative;
+  }
+
+  .hero-caption {
+    margin-top: 0.9rem;
+    color: var(--text-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  /* ---------- At a glance ---------- */
+
+  .glance {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--line);
+  }
+
+  .glance > div {
+    padding: 1.1rem 1.35rem 1.2rem;
+    background: var(--surface);
+  }
+
+  .glance dt {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .glance dd {
+    margin: 0.4rem 0 0;
+    font-size: var(--step--1);
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .glance a {
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .glance a:hover {
+    text-decoration: underline;
+  }
+
+  /* ---------- About ---------- */
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .about-copy p {
+    color: var(--text-2);
+    font-size: var(--step-1);
+    line-height: 1.7;
+  }
+
+  .about-copy p:first-child {
+    color: var(--text);
+  }
+
+  .about-copy p + p {
+    margin-top: 1.1rem;
+  }
+
+  .interests {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 2rem;
+    padding-top: 1.75rem;
+    border-top: 1px dashed var(--line-2);
+    list-style: none;
+  }
+
+  .interests li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--text-2);
+  }
+
+  .interest-icon,
+  .skill-icon,
+  .project-icon,
+  .edu-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--accent-line);
+    border-radius: 11px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin: 0;
+  }
+
+  .fact {
+    padding: 1.15rem 1.3rem 1.25rem;
+    border-radius: var(--radius);
+  }
+
+  .fact-wide {
+    grid-column: 1 / -1;
+  }
+
+  .fact dt {
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .fact dd {
+    margin: 0.45rem 0 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .fact dd span {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--text-2);
+    font-family: var(--font-body);
+    font-size: var(--step--1);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .fact-motto {
+    border-color: var(--accent-line);
+    background:
+      radial-gradient(30rem 10rem at 100% 0%, var(--accent-soft), transparent 70%),
+      var(--surface);
+  }
+
+  .fact-motto dd {
+    font-size: var(--step-2);
+  }
+
+  /* ---------- Experience ---------- */
+
+  .timeline {
+    display: grid;
+    gap: 1.25rem;
+    list-style: none;
+  }
+
+  .job {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  .job-rail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .job-rail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: -1.25rem;
+    width: 2px;
+    background: var(--line-2);
+  }
+
+  .job:first-child .job-rail::before {
+    top: 2.2rem;
+    background: linear-gradient(var(--accent-line), var(--line-2));
+  }
+
+  .job:last-child .job-rail::before {
+    bottom: auto;
+    height: 2.2rem;
+  }
+
+  .job-pad {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-top: 1.7rem;
+    border: 3px solid var(--text-3);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .job-pad.is-current {
+    border-color: var(--led);
+    box-shadow:
+      0 0 0 5px color-mix(in srgb, var(--led) 16%, transparent),
+      0 0 22px var(--led-glow);
+  }
+
+  .job-card {
+    padding: clamp(1.25rem, 3vw, 1.85rem);
+  }
+
+  .job-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.6rem 2rem;
+  }
+
+  .job-head h3 {
+    font-size: var(--step-2);
+  }
+
+  .job-at {
+    color: var(--accent-text);
+  }
+
+  .job-summary {
+    margin-top: 0.4rem;
+    color: var(--text-2);
+  }
+
+  .job-when {
+    color: var(--text-2);
+    font-size: var(--step--1);
+    text-align: right;
+  }
+
+  .job-when span {
+    display: block;
+    color: var(--text-3);
+  }
+
+  .job-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    padding: 0.28rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--led) 9%, transparent);
+    color: var(--led);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .job-points {
+    display: grid;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    list-style: none;
+  }
+
+  .job-points li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--text-2);
+  }
+
+  .job-points li::before {
+    content: '';
+    position: absolute;
+    top: 0.62em;
+    left: 0.25rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  /* ---------- Projects ---------- */
+
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    padding: clamp(0.85rem, 2vw, 1.25rem);
+    overflow: hidden;
+    border-color: var(--accent-line);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(50rem 30rem at 0% 0%, var(--glow), transparent 60%),
+      linear-gradient(180deg, var(--surface), var(--surface-2));
+  }
+
+  .feature-shot {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-lg);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .feature-shot :global(.browser) {
+    transition:
+      transform 0.6s var(--ease-out),
+      box-shadow 0.6s var(--ease-out);
+  }
+
+  .feature-shot:hover :global(.browser),
+  .feature-shot:focus-visible :global(.browser) {
+    transform: translateY(-4px) rotate(-0.4deg);
+    box-shadow:
+      0 0 0 1px var(--accent-line),
+      var(--shadow-lg);
+  }
+
+  .feature-shot :global(.browser-view)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgb(5 6 8 / 0.55));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .feature-shot:hover :global(.browser-view)::after,
+  .feature-shot:focus-visible :global(.browser-view)::after {
+    opacity: 1;
+  }
+
+  .feature-play {
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7);
+    color: var(--accent-ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, 8px);
+    transition:
+      opacity 0.3s,
+      transform 0.45s var(--ease-out);
+  }
+
+  .feature-shot:hover .feature-play,
+  .feature-shot:focus-visible .feature-play {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (hover: none) {
+    .feature-play {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .feature-body {
+    padding: clamp(0.5rem, 2vw, 1.25rem) clamp(0.5rem, 2vw, 1.5rem) clamp(0.5rem, 2vw, 1.25rem) 0;
+  }
+
+  .feature-body h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.8rem;
+    font-size: var(--step-4);
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.32rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--led) 10%, transparent);
+    color: var(--led);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .feature-tagline {
+    margin-top: 0.75rem;
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .feature-summary {
+    margin-top: 0.75rem;
+    color: var(--text-2);
+  }
+
+  .feature-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .feature-stats div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    padding: 0.8rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  .feature-stats dt {
+    margin-top: 0.35rem;
+    color: var(--text-3);
+    font-size: var(--step--2);
+    line-height: 1.35;
+  }
+
+  .feature-stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .feature-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.6rem;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .project {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.35rem, 3vw, 1.85rem);
+  }
+
+  .project-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .project-meta {
+    color: var(--text-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.06em;
+  }
+
+  .project h3 {
+    margin-top: 1.25rem;
+    font-size: var(--step-2);
+  }
+
+  .project-tagline {
+    margin-top: 0.35rem;
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+
+  .project-summary {
+    margin-top: 0.75rem;
+    margin-bottom: 1.25rem;
+    color: var(--text-2);
+  }
+
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+
+  .project-links a:hover {
+    color: var(--accent-text);
+  }
+
+  .project-here {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--text-2);
+  }
+
+  /* ---------- Skills ---------- */
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .skill {
+    padding: 1.4rem 1.4rem 1.5rem;
+  }
+
+  .skill-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .skill h3 {
+    font-size: var(--step-1);
+  }
+
+  /* ---------- Education ---------- */
+
+  .edu-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .edu,
+  .coursework {
+    padding: clamp(1.35rem, 3vw, 2rem);
+  }
+
+  .edu-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .edu-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .edu-head h3 {
+    font-size: var(--step-2);
+  }
+
+  .edu-head p {
+    margin-top: 0.25rem;
+    color: var(--text-2);
+  }
+
+  .edu-when {
+    margin-top: 1.25rem;
+    color: var(--text-3);
+    font-size: var(--step--1);
+  }
+
+  .terminal {
+    margin-top: 1.5rem;
+    padding: 1.15rem 1.25rem 1.2rem;
+    border: 1px solid var(--pcb-edge);
+    border-radius: var(--radius);
+    background: var(--pcb-bg);
+    color: #d9e6df;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+
+  .prompt {
+    color: #46f59a;
+  }
+
+  .progress {
+    position: relative;
+    height: 10px;
+    margin: 0.95rem 0 0.75rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  .progress span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--progress, 0%);
+    border-radius: inherit;
+    background: repeating-linear-gradient(90deg, #ffb224 0 9px, #ffc45a 9px 12px);
+    box-shadow: 0 0 14px rgb(255 178 36 / 0.55);
+  }
+
+  .terminal-dim {
+    color: rgb(217 230 223 / 0.6);
+  }
+
+  .coursework h3 {
+    font-size: var(--step-1);
+  }
+
+  .coursework h3 + * {
+    margin-top: 1rem;
+  }
+
+  .course-list {
+    display: grid;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+    list-style: none;
+  }
+
+  .course-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--text-2);
+  }
+
+  .course-list li :global(svg) {
+    flex: none;
+    color: var(--led);
+  }
+
+  /* ---------- Contact ---------- */
+
+  .contact {
+    padding-top: clamp(2rem, 5vw, 4rem);
+  }
+
+  .contact-card {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.35rem;
+    padding: clamp(2.25rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .contact-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(40rem 22rem at 50% -10%, var(--glow), transparent 70%),
+      radial-gradient(circle, var(--dot) 1px, transparent 1.3px) 0 0 / 20px 20px;
+    -webkit-mask-image: linear-gradient(#000, transparent 85%);
+    mask-image: linear-gradient(#000, transparent 85%);
+  }
+
+  .contact-card h2 {
+    max-width: 15ch;
+    font-size: var(--step-5);
+    letter-spacing: -0.04em;
+  }
+
+  .contact-card .section-lede {
+    max-width: 38rem;
+  }
+
+  .email-row {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.4rem 0.4rem 1.2rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+
+  .email-link {
+    font-size: var(--step-0);
+    text-decoration: none;
+  }
+
+  .email-link:hover {
+    color: var(--accent-text);
+  }
+
+  .copy-btn :global(.copy-done),
+  .copy-btn[data-copied] :global(.copy-idle) {
+    display: none;
+  }
+
+  .copy-btn[data-copied] :global(.copy-done) {
+    display: inline;
+  }
+
+  .copy-btn[data-copied] {
+    border-color: color-mix(in srgb, var(--led) 45%, transparent);
+    color: var(--led);
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .ask {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: center;
+    margin-top: 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px dashed var(--line-2);
+    width: min(100%, 46rem);
+  }
+
+  .ask-title {
+    color: var(--text-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .ask-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+  }
+
+  .ask-list a {
+    display: inline-block;
+    padding: 0.45rem 0.95rem;
+    border: 1px dashed var(--line-2);
+    border-radius: 999px;
+    color: var(--text-2);
+    font-size: var(--step--1);
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+
+  .ask-list a:hover {
+    border-style: solid;
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 1080px) {
+    .feature {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .feature-body {
+      padding: 0.25rem clamp(0.5rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1rem);
+    }
+  }
+
+  @media (max-width: 960px) {
+    .hero-grid,
+    .about-grid,
+    .edu-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero-visual {
+      max-width: 560px;
+      width: 100%;
+      margin-inline: auto;
+    }
+
+    .glance {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .skills-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .project-grid,
+    .skills-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .feature-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .job-when {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .glance {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .facts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .job {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .job-rail {
+      display: none;
+    }
+  }
+</style>

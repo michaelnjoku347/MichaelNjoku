@@ -1,0 +1,387 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { education, experience, featuredProject, profile, projects, skills } from '../data/site';
+
+const allProjects = [featuredProject, ...projects];
+const strip = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const absolute = (path: string) => new URL(path, profile.site).href;
+const technical = skills.filter((group) => !['Working with people', 'Spoken languages'].includes(group.title));
+const soft = skills.find((group) => group.title === 'Working with people');
+---
+
+<BaseLayout
+  title="Résumé"
+  description={`${profile.name}’s résumé: Computer Science at ${education.school}, experience, projects, and skills.`}
+  bodyClass="resume-page"
+>
+  <div class="container resume-wrap">
+    <div class="resume-toolbar">
+      <a class="btn btn-ghost btn-small" href="/"><Icon name="arrow-left" size={16} />Home</a>
+      <p class="resume-hint">Updated for 2026 · prints cleanly on one or two pages</p>
+      <button class="btn btn-primary btn-small" type="button" data-print>
+        <Icon name="printer" size={16} />
+        Print / Save as PDF
+      </button>
+    </div>
+
+    <article class="sheet" aria-label={`${profile.name} résumé`}>
+      <header class="sheet-head">
+        <div>
+          <h1>{profile.name}</h1>
+          <p class="sheet-title">{profile.title}</p>
+        </div>
+        <ul class="sheet-contact">
+          <li><Icon name="map-pin" size={14} />{profile.location}</li>
+          <li><Icon name="mail" size={14} /><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
+          <li><Icon name="globe" size={14} /><a href={profile.site}>{strip(profile.site)}</a></li>
+          <li>
+            <Icon name="linkedin" size={14} /><a href={profile.links.linkedin}>{strip(profile.links.linkedin)}</a>
+          </li>
+          <li><Icon name="github" size={14} /><a href={profile.links.github}>{strip(profile.links.github)}</a></li>
+        </ul>
+      </header>
+
+      <p class="sheet-summary">{profile.intro}</p>
+
+      <section aria-labelledby="r-education">
+        <h2 id="r-education">Education</h2>
+        <div class="entry">
+          <div class="entry-head">
+            <h3>{education.school}</h3>
+            <p class="entry-when">{education.graduationLabel}</p>
+          </div>
+          <div class="entry-sub">
+            <p>{education.degree}</p>
+            <p>{education.location}</p>
+          </div>
+          <p class="entry-line"><strong>Relevant coursework:</strong> {education.coursework.join(', ')}</p>
+          <p class="entry-line"><strong>Clubs:</strong> {education.clubs.join(', ')}</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="r-experience">
+        <h2 id="r-experience">Experience</h2>
+        {
+          experience.map((job) => (
+            <div class="entry">
+              <div class="entry-head">
+                <h3>
+                  {job.role} · {job.company}
+                </h3>
+                <p class="entry-when">{job.start === job.end ? job.start : `${job.start} – ${job.end}`}</p>
+              </div>
+              <div class="entry-sub">
+                <p>{job.summary}</p>
+                <p>{job.location}</p>
+              </div>
+              <ul>
+                {job.highlights.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section aria-labelledby="r-projects">
+        <h2 id="r-projects">Projects</h2>
+        {
+          allProjects.map((project) => (
+            <div class="entry">
+              <div class="entry-head">
+                <h3>
+                  {project.name} <span class="entry-tagline">· {project.tagline}</span>
+                </h3>
+                <p class="entry-when">{project.year}</p>
+              </div>
+              <div class="entry-sub">
+                <p>{project.stack.slice(0, 6).join(' · ')}</p>
+                <p>
+                  {project.links.live && project.links.live !== profile.site ? (
+                    <a href={absolute(project.links.live)}>{strip(absolute(project.links.live))}</a>
+                  ) : (
+                    project.links.repo && <a href={project.links.repo}>{strip(project.links.repo)}</a>
+                  )}
+                </p>
+              </div>
+              {project.highlights ? (
+                <ul>
+                  {project.highlights.map((point) => (
+                    <li>{point}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="entry-line">{project.summary}</p>
+              )}
+            </div>
+          ))
+        }
+      </section>
+
+      <section aria-labelledby="r-skills">
+        <h2 id="r-skills">Skills</h2>
+        <dl class="skills">
+          {
+            technical.map((group) => (
+              <div>
+                <dt>{group.title}</dt>
+                <dd>{group.items.join(', ')}</dd>
+              </div>
+            ))
+          }
+          {
+            soft && (
+              <div>
+                <dt>Soft skills</dt>
+                <dd>{soft.items.join(', ')}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>Languages</dt>
+            <dd>{profile.spokenLanguages.join(', ')}</dd>
+          </div>
+        </dl>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .resume-wrap {
+    padding-block: clamp(1.5rem, 4vw, 3rem) clamp(3rem, 8vw, 6rem);
+  }
+
+  .resume-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    max-width: 860px;
+    margin: 0 auto 1.25rem;
+  }
+
+  .resume-hint {
+    color: var(--text-3);
+    font-size: var(--step--2);
+    font-family: var(--font-mono);
+  }
+
+  .sheet {
+    --ink: #17181c;
+    --ink-2: #4a4f59;
+    --ink-3: #6b7079;
+    --rule: #e3e1db;
+    max-width: 860px;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 6vw, 3.5rem);
+    border-radius: var(--radius-lg);
+    background: #fff;
+    box-shadow: var(--shadow-lg);
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .sheet a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .sheet a:hover {
+    text-decoration: underline;
+  }
+
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 3px solid var(--ink);
+  }
+
+  .sheet h1 {
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+    letter-spacing: -0.035em;
+  }
+
+  .sheet-title {
+    margin-top: 0.3rem;
+    color: #a8520a;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .sheet-contact {
+    display: grid;
+    gap: 0.2rem;
+    color: var(--ink-2);
+    font-size: 0.82rem;
+    list-style: none;
+  }
+
+  .sheet-contact li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sheet-contact :global(svg) {
+    flex: none;
+    color: var(--ink-3);
+  }
+
+  .sheet-summary {
+    margin-top: 1.25rem;
+    color: var(--ink-2);
+  }
+
+  .sheet section {
+    margin-top: 1.6rem;
+  }
+
+  .sheet h2 {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .entry + .entry {
+    margin-top: 1rem;
+  }
+
+  .entry-head,
+  .entry-sub {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1.5rem;
+  }
+
+  .entry h3 {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  .entry-tagline {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+
+  .entry-when {
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .entry-sub {
+    color: var(--ink-3);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  .entry-line {
+    margin-top: 0.35rem;
+    color: var(--ink-2);
+  }
+
+  .entry ul {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: 0.45rem;
+    padding-left: 1.1rem;
+    color: var(--ink-2);
+  }
+
+  .entry li::marker {
+    color: var(--ink-3);
+  }
+
+  .skills {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  .skills div {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .skills dt {
+    font-weight: 700;
+  }
+
+  .skills dd {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 560px) {
+    .skills div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+  }
+
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.5in 0.55in;
+    }
+
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip-link),
+    :global(.toast),
+    .resume-toolbar {
+      display: none !important;
+    }
+
+    :global(html),
+    :global(body) {
+      background: #fff !important;
+    }
+
+    .resume-wrap {
+      width: 100%;
+      padding: 0;
+    }
+
+    .sheet {
+      max-width: none;
+      padding: 0;
+      border-radius: 0;
+      box-shadow: none;
+      font-size: 10pt;
+      line-height: 1.45;
+    }
+
+    .sheet section {
+      margin-top: 1rem;
+    }
+
+    .entry {
+      break-inside: avoid;
+    }
+  }
+</style>

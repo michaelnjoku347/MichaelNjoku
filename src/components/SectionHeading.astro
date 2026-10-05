@@ -1,0 +1,16 @@
+---
+interface Props {
+  id: string;
+  index: string;
+  label: string;
+  lede?: string;
+}
+
+const { id, index, label, lede } = Astro.props;
+---
+
+<header class="section-head" data-reveal>
+  <p class="eyebrow"><span class="eyebrow-index">{index}</span>{label}</p>
+  <h2 id={id}><slot /></h2>
+  {lede && <p class="section-lede">{lede}</p>}
+</header>

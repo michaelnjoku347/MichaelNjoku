@@ -1,0 +1,247 @@
+---
+import Icon from './Icon.astro';
+import { contactForm, profile } from '../data/site';
+
+const accessKey = contactForm.accessKey.trim();
+const thanks = new URL('/contact/thanks/', Astro.site ?? profile.site).href;
+---
+
+{
+  accessKey ? (
+    <form class="contact-form card" action="https://api.web3forms.com/submit" method="POST" data-contact-form>
+      <input type="hidden" name="access_key" value={accessKey} />
+      <input type="hidden" name="from_name" value="njoku.dev" />
+      <input type="hidden" name="redirect" value={thanks} />
+      <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display: none" />
+
+      <div class="contact-fields" data-contact-fields>
+        <div class="field-row">
+          <label class="field">
+            <span>Name</span>
+            <input name="name" type="text" required maxlength="100" autocomplete="name" />
+          </label>
+          <label class="field">
+            <span>Email</span>
+            <input name="email" type="email" required maxlength="200" autocomplete="email" />
+          </label>
+        </div>
+        <label class="field">
+          <span>
+            Subject <em>optional</em>
+          </span>
+          <input name="subject" type="text" maxlength="150" data-contact-subject />
+        </label>
+        <label class="field">
+          <span>Message</span>
+          <textarea name="message" required maxlength="5000" rows="6"></textarea>
+        </label>
+        <p class="contact-error" role="alert" data-contact-error hidden>
+          Sorry, that didn’t go through. Please try again in a moment, or{' '}
+          <a href={profile.links.linkedin} target="_blank" rel="me noopener">
+            message me on LinkedIn
+          </a>
+          .
+        </p>
+        <div class="contact-submit">
+          <button class="btn btn-primary btn-lg" type="submit">
+            <Icon name="send" />
+            <span data-contact-label>Send message</span>
+          </button>
+          <p class="contact-privacy">Delivered to my inbox by Web3Forms. I’ll only use your email to reply to you.</p>
+        </div>
+      </div>
+
+      <div class="contact-sent" data-contact-sent tabindex="-1" hidden>
+        <span class="contact-sent-icon">
+          <Icon name="check" size={26} />
+        </span>
+        <h3>Message sent</h3>
+        <p>Thanks for reaching out. I’ll get back to you soon.</p>
+        <button class="btn btn-small" type="button" data-contact-reset>
+          Send another message
+        </button>
+      </div>
+    </form>
+  ) : (
+    <div class="contact-form contact-fallback card">
+      <span class="contact-sent-icon">
+        <Icon name="linkedin" size={24} />
+      </span>
+      <h3>Message me on LinkedIn</h3>
+      <p>Send me a message there and I’ll get back to you.</p>
+      <a class="btn btn-primary" href={profile.links.linkedin} target="_blank" rel="me noopener">
+        <Icon name="linkedin" />
+        Open LinkedIn
+        <span class="sr-only"> (opens in a new tab)</span>
+      </a>
+      {import.meta.env.DEV && (
+        <p class="dev-note">
+          Only you can see this note (it shows while running <code>npm run dev</code>): add your Web3Forms access key
+          in <code>src/data/site.ts</code> to show a contact form here.
+        </p>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .contact-form {
+    padding: clamp(1.25rem, 3vw, 1.85rem);
+    border-radius: var(--radius-lg);
+    text-align: left;
+  }
+
+  .contact-fields {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  .field em {
+    color: var(--text-3);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--step-0);
+    font-weight: 400;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .field textarea {
+    min-height: 9rem;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  .field input:focus-visible,
+  .field textarea:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .field input:user-invalid,
+  .field textarea:user-invalid {
+    border-color: #f05252;
+  }
+
+  .contact-submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 0.25rem;
+  }
+
+  .contact-submit button[disabled] {
+    cursor: progress;
+    opacity: 0.75;
+  }
+
+  .contact-privacy {
+    flex: 1 1 14rem;
+    color: var(--text-3);
+    font-size: var(--step--2);
+    line-height: 1.5;
+  }
+
+  .contact-error {
+    padding: 0.75rem 0.95rem;
+    border: 1px solid rgb(240 82 82 / 0.4);
+    border-radius: 12px;
+    background: rgb(240 82 82 / 0.1);
+    font-size: var(--step--1);
+  }
+
+  .contact-sent,
+  .contact-fallback {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .contact-sent {
+    min-height: 24rem;
+    outline: none;
+  }
+
+  .contact-fallback {
+    min-height: 18rem;
+  }
+
+  .contact-sent-icon {
+    display: grid;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.25rem;
+    border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--led) 12%, transparent);
+    color: var(--led);
+  }
+
+  .contact-fallback .contact-sent-icon {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .contact-sent h3,
+  .contact-fallback h3 {
+    font-size: var(--step-2);
+  }
+
+  .contact-sent p,
+  .contact-fallback p {
+    max-width: 30ch;
+    color: var(--text-2);
+  }
+
+  .contact-fallback .btn {
+    margin-top: 0.5rem;
+  }
+
+  .contact-fallback .dev-note {
+    max-width: 38ch;
+    margin-top: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px dashed var(--line-2);
+    border-radius: 12px;
+    color: var(--text-3);
+    font-size: var(--step--2);
+  }
+
+  @media (max-width: 560px) {
+    .field-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

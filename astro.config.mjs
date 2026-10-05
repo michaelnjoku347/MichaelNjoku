@@ -33,7 +33,7 @@ export default defineConfig({
     sitemap({
       // The demo is a prebuilt app in public/, so Astro does not know about it.
       customPages: ['https://njoku.dev/kilobyte/'],
-      filter: (page) => !page.includes('/404'),
+      filter: (page) => !page.includes('/404') && !page.includes('/contact/thanks'),
     }),
   ],
   prefetch: {

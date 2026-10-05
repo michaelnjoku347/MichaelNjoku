@@ -22,19 +22,12 @@
   --step-4: clamp(2.3rem, 1.6rem + 3.3vw, 4.1rem);
   --step-5: clamp(2.6rem, 1.6rem + 4.8vw, 5.4rem);
 
-  /* The hero circuit board is a physical object, so it keeps one look in both themes. */
-  --pcb-bg: #08110d;
-  --pcb-bg-hi: #102419;
-  --pcb-dot: rgb(170 255 215 / 0.075);
-  --pcb-edge: rgb(170 255 215 / 0.12);
-  --pcb-trace: #6f4a24;
-  --pcb-trace-hi: #e7a861;
-  --pcb-pad: #d8b56d;
-  --pcb-silk: rgb(232 244 238 / 0.72);
-  --pcb-silk-dim: rgb(232 244 238 / 0.38);
-  --ic-body: #111214;
-  --ic-edge: #2a2c31;
-  --pulse: #ffd884;
+  /* Terminal and code blocks stay dark in both themes. */
+  --code-bg: #0d1014;
+  --code-line: rgb(255 255 255 / 0.1);
+  --code-text: #dde3ea;
+  --code-dim: rgb(221 227 234 / 0.6);
+  --code-prompt: #46f59a;
 }
 
 :root,
@@ -100,6 +93,10 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 html {
@@ -436,7 +433,7 @@ kbd {
 
 .section {
   position: relative;
-  padding-block: clamp(4.5rem, 10vw, 8rem);
+  padding-block: clamp(3.5rem, 8vw, 6.25rem);
 }
 
 .section-head {
@@ -523,6 +520,175 @@ kbd {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ---------- Badges and breadcrumbs ---------- */
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.32rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--led) 10%, transparent);
+  color: var(--led);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  color: var(--text-2);
+  font-size: var(--step--1);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+/* ---------- Inner page header ---------- */
+
+.page-hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 5vw, 3rem);
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--header-h)) 0 0;
+  z-index: -1;
+  background:
+    radial-gradient(40rem 24rem at 20% 10%, var(--glow), transparent 70%),
+    radial-gradient(circle, var(--dot) 1px, transparent 1.3px) 0 0 / 22px 22px;
+  -webkit-mask-image: linear-gradient(#000 30%, transparent);
+  mask-image: linear-gradient(#000 30%, transparent);
+  pointer-events: none;
+}
+
+.page-hero h1 {
+  margin-top: 0.9rem;
+  font-size: var(--step-5);
+  letter-spacing: -0.045em;
+}
+
+.page-hero .section-lede {
+  max-width: 44rem;
+  margin-top: 1.1rem;
+}
+
+/* ---------- Markdown content (project pages) ---------- */
+
+.prose {
+  color: var(--text-2);
+  font-size: var(--step-1);
+  line-height: 1.75;
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--text);
+}
+
+.prose h2 {
+  margin-top: 2.2em;
+  font-size: var(--step-3);
+}
+
+.prose h3 {
+  margin-top: 1.8em;
+  font-size: var(--step-2);
+}
+
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 0.7em;
+}
+
+.prose strong {
+  color: var(--text);
+}
+
+.prose a {
+  color: var(--text);
+  text-decoration-color: var(--accent-line);
+  text-decoration-thickness: 2px;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  display: grid;
+  gap: 0.5em;
+  padding-left: 1.35em;
+}
+
+.prose li::marker {
+  color: var(--accent-text);
+}
+
+.prose img {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.prose blockquote {
+  margin: 1.5em 0;
+  padding: 0.2em 0 0.2em 1.2em;
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+  font-style: italic;
+}
+
+.prose code {
+  padding: 0.12em 0.4em;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-3);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.prose pre {
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--code-line);
+  border-radius: var(--radius);
+  background: var(--code-bg) !important;
+  font-size: var(--step--1);
+  line-height: 1.7;
+}
+
+.prose pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--code-text);
+  font-size: inherit;
+}
+
+.prose hr {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px dashed var(--line-2);
 }
 
 /* ---------- Theme switch animation ---------- */

@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { education, experience, featuredProject, profile, projects, skills } from '../data/site';
+import { education, experience, profile, skills } from '../data/site';
+import { getProjects, isThisSite } from '../lib/projects';
 
-const allProjects = [featuredProject, ...projects];
+const projects = await getProjects();
 const strip = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 const absolute = (path: string) => new URL(path, profile.site).href;
 const technical = skills.filter((group) => !['Working with people', 'Spoken languages'].includes(group.title));
@@ -33,8 +34,10 @@ const soft = skills.find((group) => group.title === 'Working with people');
         </div>
         <ul class="sheet-contact">
           <li><Icon name="map-pin" size={14} />{profile.location}</li>
-          <li><Icon name="mail" size={14} /><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
           <li><Icon name="globe" size={14} /><a href={profile.site}>{strip(profile.site)}</a></li>
+          <li>
+            <Icon name="message" size={14} /><a href={`${profile.site}/#contact`}>{strip(profile.site)}/#contact</a>
+          </li>
           <li>
             <Icon name="linkedin" size={14} /><a href={profile.links.linkedin}>{strip(profile.links.linkedin)}</a>
           </li>
@@ -42,7 +45,7 @@ const soft = skills.find((group) => group.title === 'Working with people');
         </ul>
       </header>
 
-      <p class="sheet-summary">{profile.intro}</p>
+      <p class="sheet-summary">{profile.summary}</p>
 
       <section aria-labelledby="r-education">
         <h2 id="r-education">Education</h2>
@@ -88,35 +91,31 @@ const soft = skills.find((group) => group.title === 'Working with people');
       <section aria-labelledby="r-projects">
         <h2 id="r-projects">Projects</h2>
         {
-          allProjects.map((project) => (
-            <div class="entry">
-              <div class="entry-head">
-                <h3>
-                  {project.name} <span class="entry-tagline">· {project.tagline}</span>
-                </h3>
-                <p class="entry-when">{project.year}</p>
+          projects.map((project) => {
+            const { data } = project;
+            const link = data.demo && !isThisSite(project) ? absolute(data.demo) : data.repo;
+            return (
+              <div class="entry">
+                <div class="entry-head">
+                  <h3>
+                    {data.title} <span class="entry-tagline">· {data.summary}</span>
+                  </h3>
+                  <p class="entry-when">{data.year}</p>
+                </div>
+                <div class="entry-sub">
+                  <p>{data.tags.slice(0, 6).join(' · ')}</p>
+                  <p>{link && <a href={link}>{strip(link)}</a>}</p>
+                </div>
+                {data.highlights && (
+                  <ul>
+                    {data.highlights.map((point) => (
+                      <li>{point}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <div class="entry-sub">
-                <p>{project.stack.slice(0, 6).join(' · ')}</p>
-                <p>
-                  {project.links.live && project.links.live !== profile.site ? (
-                    <a href={absolute(project.links.live)}>{strip(absolute(project.links.live))}</a>
-                  ) : (
-                    project.links.repo && <a href={project.links.repo}>{strip(project.links.repo)}</a>
-                  )}
-                </p>
-              </div>
-              {project.highlights ? (
-                <ul>
-                  {project.highlights.map((point) => (
-                    <li>{point}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p class="entry-line">{project.summary}</p>
-              )}
-            </div>
-          ))
+            );
+          })
         }
       </section>
 

@@ -1,6 +1,9 @@
 /**
- * Everything the site says lives here. Edit this file to update njoku.dev —
- * the home page, the Kilobyte case study, and the printable résumé all read from it.
+ * Your profile, experience, education, and skills.
+ *
+ * Edit the text between the quotes and save; the home page and the résumé
+ * both update. Projects live in their own files in src/content/projects/
+ * (see the README for how to add one).
  */
 
 export const profile = {
@@ -9,16 +12,18 @@ export const profile = {
   title: 'Computer Science Student & Developer',
   location: 'Freeport, NY',
   timeZone: 'America/New_York',
-  email: 'michaeln2029@gmail.com',
   site: 'https://njoku.dev',
   status: 'Open to internships & entry-level roles',
-  headline: 'I build where hardware meets software.',
+  /** The paragraph under your name on the home page. */
   intro:
-    'I’m a Computer Science student at Farmingdale State College who loves working with both hardware and software. I’m a big fan of creativity, I love expressing my ideas in code, and I enjoy building alongside other developers—and teaching what I know.',
+    'I study Computer Science at Farmingdale State College. I love expressing my ideas in code, building alongside other developers, and teaching what I know. This is where I keep everything I make.',
+  /** The summary at the top of the résumé page. */
+  summary:
+    'Computer Science student at Farmingdale State College (Class of 2029) who loves expressing ideas in code, building alongside other developers, and teaching what I know. Currently interning at Venture Starters and building Kilobyte, a browser-game catalog.',
   about: [
-    'I’m Michael—a Computer Science student at Farmingdale State College (Class of 2029) based in Freeport, NY. I’m happiest when a project touches both sides of the machine: digital circuits and PC diagnostics on one end, Java, Python, and Lua on the other.',
+    'I’m Michael, a Computer Science student at Farmingdale State College (Class of 2029) from Freeport, NY. I like understanding how things work all the way down, so my interests run from Java, Python, and Lua to digital circuits and PC diagnostics.',
     'Right now I’m interning with Venture Starters, analyzing live startup pitches and learning how early-stage teams form, iterate, and scale toward funding. On campus I’m part of the Artificial Intelligence Club and the Cyber Security Club.',
-    'My latest build is Kilobyte, a browser-game catalog that lets anyone publish a game without the site ever hosting the files. I learn by shipping, one commit at a time.',
+    'My latest project is Kilobyte, a browser-game catalog anyone can publish to without the site ever hosting the files. I learn best by building, so there’s always another project on the way.',
   ],
   motto: 'Rome wasn’t built in a day.',
   spokenLanguages: ['English', 'Spanish (conversational)'],
@@ -29,6 +34,21 @@ export const profile = {
     source: 'https://github.com/michaelnjoku347/MichaelNjoku',
   },
 } as const;
+
+/**
+ * The contact form keeps your email address off the site. Messages are sent
+ * through Web3Forms (https://web3forms.com), which forwards them to your inbox.
+ *
+ * To turn it on: enter your email at https://web3forms.com, confirm the message
+ * they send you, and paste the access key below (or set PUBLIC_WEB3FORMS_ACCESS_KEY
+ * on Vercel). The key is safe to publish: it can only send messages to you.
+ * Until a key is added, the Contact section points visitors to LinkedIn instead.
+ */
+const web3formsKey = '';
+
+export const contactForm = {
+  accessKey: import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || web3formsKey,
+};
 
 export const education = {
   school: 'Farmingdale State College',
@@ -59,6 +79,7 @@ export type Experience = {
   highlights: string[];
 };
 
+/** Newest first. Set `current: true` on the job you have now. */
 export const experience: Experience[] = [
   {
     company: 'Venture Starters',
@@ -102,87 +123,6 @@ export const experience: Experience[] = [
       'Collaborated on group projects and presented outcomes to a panel, incorporating structured feedback.',
       'Adapted coordination and communication strategies to a fully remote, virtual work environment.',
     ],
-  },
-];
-
-export type Project = {
-  slug: string;
-  name: string;
-  tagline: string;
-  year: string;
-  kind: string;
-  summary: string;
-  highlights?: string[];
-  stack: string[];
-  stats?: { value: string; label: string }[];
-  links: { repo?: string; live?: string; caseStudy?: string };
-};
-
-export const featuredProject: Project = {
-  slug: 'kilobyte',
-  name: 'Kilobyte',
-  tagline: 'A browser-game catalog that never hosts the games.',
-  year: '2026',
-  kind: 'Personal project',
-  summary:
-    'Pick a title, press Play, or publish your own—by connecting a GitHub repo, uploading a build that stays in your browser, or minting a tiny JSON cart. The site only stores the catalog, so hosting costs stay at a static frontend.',
-  highlights: [
-    'Three publishing paths: public GitHub repos played through jsDelivr or GitHub Pages, zip/HTML uploads kept in the creator’s IndexedDB and served by a service worker, and JSON “carts” run by a built-in canvas engine.',
-    'Fully static—no server, no database, no paid AI proxy. Optional Gemini and GitHub tokens never leave the visitor’s browser.',
-    'A catalog ranked by five-star ratings, with genre filters, keyboard search (Ctrl/⌘ K or /), saves, light and dark appearances, and an optional on-device profile.',
-    'Vitest unit tests, a Puppeteer smoke test, oxlint, and a GitHub Actions pipeline that lints, tests, and builds every push.',
-  ],
-  stack: [
-    'React 19',
-    'TypeScript',
-    'Vite',
-    'IndexedDB',
-    'Service Workers',
-    'Canvas API',
-    'GitHub REST API',
-    'Gemini API',
-    'Vitest',
-    'Puppeteer',
-    'GitHub Actions',
-  ],
-  stats: [
-    { value: '15', label: 'games in the house library' },
-    { value: '3', label: 'ways to publish a game' },
-    { value: '0 B', label: 'of game files on the server' },
-    { value: '640 B', label: 'smallest playable cart' },
-  ],
-  links: {
-    live: '/kilobyte/',
-    repo: 'https://github.com/michaelnjoku347/KiloByte',
-    caseStudy: '/projects/kilobyte/',
-  },
-};
-
-export const projects: Project[] = [
-  {
-    slug: 'njoku-dev',
-    name: 'njoku.dev',
-    tagline: 'This portfolio, rebuilt from scratch.',
-    year: '2026',
-    kind: 'Personal project',
-    summary:
-      'Version one was hand-written HTML/CSS shipped with the Vercel CLI. Version two is a static Astro + TypeScript site with light and dark themes, a command menu, scroll-driven motion, and a printable résumé—all generated from a single content file.',
-    stack: ['Astro', 'TypeScript', 'CSS', 'Vercel'],
-    links: {
-      repo: 'https://github.com/michaelnjoku347/MichaelNjoku',
-      live: 'https://njoku.dev',
-    },
-  },
-  {
-    slug: 'practice',
-    name: 'Python & Java practice',
-    tagline: 'Fundamentals beyond the syllabus.',
-    year: 'Ongoing',
-    kind: 'Independent study',
-    summary:
-      'Small projects in Python and Java that push my programming fundamentals past coursework, documented on GitHub as I go.',
-    stack: ['Python', 'Java', 'IntelliJ IDEA', 'Git'],
-    links: { repo: 'https://github.com/michaelnjoku347' },
   },
 ];
 
@@ -232,9 +172,6 @@ export const skills: SkillGroup[] = [
   },
 ];
 
-/** The eight "pins" on the hero chip, counter-clockwise from pin 1 like a real DIP package. */
-export const chipPins = ['Java', 'Python', 'Lua', 'JavaScript', 'Git', 'Godot', 'MySQL', 'HTML'] as const;
-
 export const askMeAbout = [
   'My website',
   'My GitHub',
@@ -251,9 +188,9 @@ export const interests = [
 ] as const;
 
 export const nav = [
+  { id: 'projects', label: 'Projects' },
   { id: 'about', label: 'About' },
   { id: 'experience', label: 'Experience' },
-  { id: 'projects', label: 'Projects' },
   { id: 'skills', label: 'Skills' },
   { id: 'contact', label: 'Contact' },
 ] as const;

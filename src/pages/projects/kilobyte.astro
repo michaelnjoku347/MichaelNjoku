@@ -1,0 +1,825 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BrowserFrame from '../../components/BrowserFrame.astro';
+import Icon, { type IconName } from '../../components/Icon.astro';
+import { featuredProject as kilobyte } from '../../data/site';
+import findShot from '../../assets/kilobyte/search.webp';
+import catalogShot from '../../assets/kilobyte/catalog.webp';
+import playShot from '../../assets/kilobyte/play.webp';
+import publishShot from '../../assets/kilobyte/publish.webp';
+import hostingShot from '../../assets/kilobyte/hosting.webp';
+
+const demo = kilobyte.links.live ?? '/kilobyte/';
+
+const tour = [
+  {
+    id: 'find',
+    label: 'Find',
+    image: findShot,
+    alt: 'Kilobyte search results for the letter e: fifteen matching games shown as colorful cover cards with genre labels, star ratings, and Play and Save buttons.',
+    caption: 'Search from anywhere with ⌘K or /. Every game gets a color-coded cover, a genre, and a star rating.',
+  },
+  {
+    id: 'catalog',
+    label: 'Catalog',
+    image: catalogShot,
+    alt: 'Kilobyte’s All games page: a ranked table of games with genre filters at the top and a rating and Play button on each row.',
+    caption: 'The full catalog, ranked by star rating and filterable by genre.',
+  },
+  {
+    id: 'play',
+    label: 'Play',
+    image: playShot,
+    alt: 'Star Nibbler running in Kilobyte’s player, labeled Arcade, Casual, JSON cart, 640 B, with Copy link and Remix buttons.',
+    caption: 'Star Nibbler is a 640-byte JSON cart running on the built-in canvas engine. Copy a link to share it, or remix it.',
+  },
+  {
+    id: 'publish',
+    label: 'Publish',
+    image: publishShot,
+    alt: 'Kilobyte’s Make page titled “Publish a game. We store a pointer.”, with tabs for Upload files, Connect GitHub, and Prompt a cart.',
+    caption: 'Three ways in: upload files, connect the GitHub repo that already hosts a game, or prompt a tiny JSON cart.',
+  },
+  {
+    id: 'hosting',
+    label: 'Hosting',
+    image: hostingShot,
+    alt: 'Kilobyte’s hosting page titled “You do not host the games. You host the catalog.”, comparing 40 MB for a stored build with 0 B for a GitHub-connected game.',
+    caption: 'The math behind the idea: one WebGL build can weigh 40 MB, while a GitHub-connected game costs the server 0 B.',
+  },
+];
+
+const paths: { icon: IconName; title: string; body: string; stores: string }[] = [
+  {
+    icon: 'github',
+    title: 'Connect a GitHub repo',
+    body: 'Paste owner/repo. Kilobyte reads the public GitHub API, finds the game’s index.html, and plays it through jsDelivr or GitHub Pages. It never receives a zip.',
+    stores: 'A pointer to the repo',
+  },
+  {
+    icon: 'box',
+    title: 'Upload a build',
+    body: 'Drop in HTML, a folder, or a zip. fflate unpacks it in the browser, the files go into IndexedDB, and a service worker serves them like a tiny web server.',
+    stores: 'Nothing. It stays on the creator’s device',
+  },
+  {
+    icon: 'zap',
+    title: 'Prompt a JSON cart',
+    body: 'Describe a game in a line. A seeded generator picks the genre, theme, and rules, or creators can opt into Gemini with their own key. A canvas engine runs the result.',
+    stores: 'The cart itself, often under 1 KB',
+  },
+];
+
+const internals = [
+  {
+    title: 'Static by design',
+    body: 'React 19 and TypeScript on Vite, with a hash router, so the whole app runs from any static host. That’s how it lives inside this site at /kilobyte/.',
+  },
+  {
+    title: 'Games in a URL',
+    body: 'Share links gzip a cart with the browser’s CompressionStream and pack it into the hash (#/c/…). The link is the game, so nothing has to be saved anywhere.',
+  },
+  {
+    title: 'A tiny game engine',
+    body: 'JSON carts describe shapes, behaviors, and goals; a small canvas engine runs them on requestAnimationFrame.',
+  },
+  {
+    title: 'Keys never leave the browser',
+    body: 'Optional Gemini and GitHub tokens are typed by the visitor, kept in localStorage, and only sent to those APIs. There’s no proxy to pay for.',
+  },
+  {
+    title: 'A catalog people can use',
+    body: 'Five-star ratings, genre filters, saves, keyboard search, light and dark appearances, and an optional on-device profile.',
+  },
+  {
+    title: 'Checked on every push',
+    body: '17 Vitest unit tests, a Puppeteer smoke test, and oxlint, with GitHub Actions linting, testing, and building each change.',
+  },
+];
+---
+
+<BaseLayout
+  title="Kilobyte — case study"
+  description="Kilobyte is a browser-game catalog by Michael Njoku that never hosts the games. Play the live demo and see how it works."
+>
+  <article class="study">
+    <header class="study-hero">
+      <div class="study-hero-bg" aria-hidden="true"></div>
+      <div class="container">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/#projects"><Icon name="arrow-left" size={16} />All projects</a>
+        </nav>
+        <p class="eyebrow" data-reveal>Case study · {kilobyte.kind} · {kilobyte.year}</p>
+        <h1 data-reveal style="--reveal-delay: 1">
+          {kilobyte.name}<span class="live-badge"><span class="led" aria-hidden="true"></span>Live</span>
+        </h1>
+        <p class="study-tagline" data-reveal style="--reveal-delay: 2">{kilobyte.tagline}</p>
+        <p class="study-summary" data-reveal style="--reveal-delay: 3">{kilobyte.summary}</p>
+        <div class="study-actions" data-reveal style="--reveal-delay: 4">
+          <a class="btn btn-primary btn-lg" href={demo} target="_blank" rel="noopener">
+            <Icon name="gamepad" />
+            Play the live demo
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+          <a class="btn btn-lg" href={kilobyte.links.repo} target="_blank" rel="noopener">
+            <Icon name="github" />
+            View the code
+          </a>
+        </div>
+        <dl class="study-meta" data-reveal style="--reveal-delay: 5">
+          <div><dt>Role</dt><dd>Designer &amp; developer</dd></div>
+          <div><dt>Year</dt><dd>{kilobyte.year}</dd></div>
+          <div><dt>Platform</dt><dd>Static web app</dd></div>
+          <div><dt>Core stack</dt><dd>React 19 · TypeScript · Vite</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <section class="container study-section" aria-labelledby="demo-title">
+      <div class="study-head" data-reveal>
+        <p class="eyebrow"><span class="eyebrow-index">01</span>Try it</p>
+        <h2 id="demo-title">Play it right here.</h2>
+        <p class="section-lede">
+          This is the real app, not a recording. Load it below or open it full-screen. Uploads and saves stay in your
+          browser.
+        </p>
+      </div>
+
+      <div data-reveal>
+        <BrowserFrame address="njoku.dev/kilobyte" live class="demo-browser">
+          <a slot="actions" class="demo-open" href={demo} target="_blank" rel="noopener">
+            Open in a new tab <Icon name="arrow-up-right" size={14} />
+          </a>
+          <div class="demo-stage" data-demo={demo} data-demo-title="Kilobyte live demo">
+            <Image
+              class="demo-poster"
+              src={findShot}
+              alt=""
+              widths={[960, 1440, 1920]}
+              sizes="(min-width: 1180px) 1160px, 100vw"
+              loading="lazy"
+            />
+            <div class="demo-cover">
+              <button class="btn btn-primary btn-lg" type="button" data-demo-load>
+                <Icon name="gamepad" />
+                Load the live demo
+              </button>
+              <p class="mono">Runs entirely in your browser · about 100 KB</p>
+            </div>
+          </div>
+        </BrowserFrame>
+      </div>
+    </section>
+
+    <section class="container study-section" aria-labelledby="tour-title">
+      <div class="study-head" data-reveal>
+        <p class="eyebrow"><span class="eyebrow-index">02</span>Tour</p>
+        <h2 id="tour-title">Five screens, one idea.</h2>
+      </div>
+
+      <div class="tour" data-reveal>
+        <div class="tour-tabs" role="tablist" aria-label="Kilobyte screens" data-tabs>
+          {
+            tour.map((shot, i) => (
+              <button
+                class="tour-tab"
+                type="button"
+                role="tab"
+                id={`tab-${shot.id}`}
+                aria-controls={`panel-${shot.id}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                <span class="mono">0{i + 1}</span>
+                {shot.label}
+              </button>
+            ))
+          }
+        </div>
+        {
+          tour.map((shot, i) => (
+            <figure
+              class="tour-panel"
+              role="tabpanel"
+              id={`panel-${shot.id}`}
+              aria-labelledby={`tab-${shot.id}`}
+              hidden={i !== 0}
+            >
+              <BrowserFrame address={`njoku.dev/kilobyte · ${shot.label.toLowerCase()}`}>
+                <Image
+                  src={shot.image}
+                  alt={shot.alt}
+                  widths={[960, 1440, 1920]}
+                  sizes="(min-width: 1180px) 1160px, 100vw"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+              </BrowserFrame>
+              <figcaption>{shot.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="container study-section idea" aria-labelledby="idea-title">
+      <div class="idea-grid">
+        <div class="study-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-index">03</span>The idea</p>
+          <h2 id="idea-title">Host the catalog, not the games.</h2>
+        </div>
+        <div class="idea-copy" data-reveal style="--reveal-delay: 1">
+          <p>
+            Game files are heavy. A single Unity or WebGL build can weigh 40 MB, so a site that stored every upload
+            would turn into a hosting bill fast.
+          </p>
+          <p>
+            Kilobyte flips that around. It keeps only the listing (title, genre, rating, and a pointer to where the game
+            lives), while the files stay on GitHub or on the creator’s own machine. There’s no server, no database, and
+            no paid AI proxy: visitors play for free, creators publish for free, and the bill stays at hosting a
+            frontend.
+          </p>
+        </div>
+      </div>
+
+      <ul class="stats" aria-label="Kilobyte by the numbers">
+        {
+          kilobyte.stats?.map((stat, i) => (
+            <li class="stat card" data-reveal style={`--reveal-delay: ${i}`}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="container study-section" aria-labelledby="paths-title">
+      <div class="study-head" data-reveal>
+        <p class="eyebrow"><span class="eyebrow-index">04</span>Publishing</p>
+        <h2 id="paths-title">Three ways to get a game on the shelf.</h2>
+      </div>
+      <ol class="paths">
+        {
+          paths.map((path, i) => (
+            <li class="path card spotlight" data-reveal style={`--reveal-delay: ${i}`}>
+              <div class="path-top">
+                <span class="path-icon">
+                  <Icon name={path.icon} size={20} />
+                </span>
+                <span class="mono path-index">Path {i + 1}</span>
+              </div>
+              <h3>{path.title}</h3>
+              <p>{path.body}</p>
+              <p class="path-stores">
+                <span class="mono">Kilobyte stores</span>
+                {path.stores}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="container study-section" aria-labelledby="internals-title">
+      <div class="study-head" data-reveal>
+        <p class="eyebrow"><span class="eyebrow-index">05</span>Under the hood</p>
+        <h2 id="internals-title">Small pieces, carefully joined.</h2>
+      </div>
+      <div class="internals">
+        {
+          internals.map((item, i) => (
+            <div class="internal" data-reveal style={`--reveal-delay: ${i % 3}`}>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          ))
+        }
+      </div>
+      <ul class="tags study-stack" aria-label="Full stack" data-reveal>
+        {kilobyte.stack.map((tech) => <li class="tag">{tech}</li>)}
+      </ul>
+    </section>
+
+    <section class="container study-section" aria-labelledby="run-title">
+      <div class="run card" data-reveal>
+        <div>
+          <p class="eyebrow"><span class="eyebrow-index">06</span>Run it yourself</p>
+          <h2 id="run-title">Clone it, run it, remix it.</h2>
+          <p class="section-lede">Kilobyte is open source. You need Node.js and about thirty seconds.</p>
+          <div class="run-actions">
+            <a class="btn btn-primary" href={demo} target="_blank" rel="noopener">
+              <Icon name="gamepad" />
+              Play the live demo
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+            <a class="btn" href={kilobyte.links.repo} target="_blank" rel="noopener">
+              <Icon name="github" />
+              michaelnjoku347/KiloByte
+            </a>
+          </div>
+        </div>
+        <pre class="run-code" aria-label="Terminal commands"><code><span class="prompt">$</span> git clone https://github.com/michaelnjoku347/KiloByte.git
+<span class="prompt">$</span> cd KiloByte
+<span class="prompt">$</span> npm install
+<span class="prompt">$</span> npm run dev</code></pre>
+      </div>
+
+      <nav class="study-next" aria-label="More">
+        <a href="/#projects"><Icon name="arrow-left" size={18} />Back to all projects</a>
+        <a href="/resume/">See my résumé<Icon name="arrow-right" size={18} /></a>
+      </nav>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .study-hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .study-hero-bg {
+    position: absolute;
+    inset: calc(-1 * var(--header-h)) 0 0;
+    z-index: -1;
+    background:
+      radial-gradient(40rem 24rem at 20% 10%, var(--glow), transparent 70%),
+      radial-gradient(circle, var(--dot) 1px, transparent 1.3px) 0 0 / 22px 22px;
+    -webkit-mask-image: linear-gradient(#000 30%, transparent);
+    mask-image: linear-gradient(#000 30%, transparent);
+  }
+
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-2);
+    font-size: var(--step--1);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--text);
+  }
+
+  .study-hero h1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-top: 0.9rem;
+    font-size: clamp(3rem, 2rem + 6vw, 6.5rem);
+    letter-spacing: -0.045em;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--led) 40%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--led) 10%, transparent);
+    color: var(--led);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .study-tagline {
+    max-width: 30ch;
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  .study-summary {
+    max-width: 44rem;
+    margin-top: 1.25rem;
+    color: var(--text-2);
+    font-size: var(--step-1);
+  }
+
+  .study-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .study-meta {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin: 2.75rem 0 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--line);
+  }
+
+  .study-meta div {
+    padding: 1rem 1.25rem 1.1rem;
+    background: var(--surface);
+  }
+
+  .study-meta dt,
+  .path-stores .mono {
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .study-meta dd {
+    margin: 0.35rem 0 0;
+    font-weight: 600;
+  }
+
+  .study-section {
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .study-head {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 44rem;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .study-head h2,
+  .run h2 {
+    font-size: var(--step-4);
+  }
+
+  /* ---------- Demo ---------- */
+
+  .demo-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #d7dbe2;
+    font-size: var(--step--2);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .demo-open:hover {
+    color: #fff;
+  }
+
+  .demo-stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: #09090b;
+  }
+
+  .demo-stage :global(.demo-poster) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    filter: saturate(0.9) brightness(0.55) blur(1px);
+  }
+
+  .demo-cover {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.9rem;
+    padding: 1.5rem;
+    color: #e6e8ec;
+    text-align: center;
+  }
+
+  .demo-cover p {
+    font-size: var(--step--2);
+    opacity: 0.8;
+  }
+
+  .demo-stage[data-loaded] :global(.demo-poster),
+  .demo-stage[data-loaded] .demo-cover {
+    display: none;
+  }
+
+  .demo-stage :global(.demo-frame) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
+
+  /* ---------- Tour ---------- */
+
+  .tour-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 1.25rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+  }
+
+  .tour-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-2);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .tour-tab .mono {
+    color: var(--text-3);
+    font-size: var(--step--2);
+  }
+
+  .tour-tab:hover {
+    color: var(--text);
+  }
+
+  .tour-tab[aria-selected='true'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .tour-tab[aria-selected='true'] .mono {
+    color: rgb(29 20 4 / 0.6);
+  }
+
+  .tour-panel {
+    margin: 0;
+  }
+
+  .tour-panel[hidden] {
+    display: none;
+  }
+
+  .tour-panel figcaption {
+    max-width: 50rem;
+    margin-top: 1rem;
+    color: var(--text-2);
+  }
+
+  /* ---------- Idea ---------- */
+
+  .idea-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  .idea-copy p {
+    color: var(--text-2);
+    font-size: var(--step-1);
+    line-height: 1.7;
+  }
+
+  .idea-copy p + p {
+    margin-top: 1.1rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    list-style: none;
+  }
+
+  .stat {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.4rem 1.4rem 1.5rem;
+  }
+
+  .stat strong {
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  .stat span {
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+
+  /* ---------- Paths ---------- */
+
+  .paths {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+  }
+
+  .path {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1.6rem;
+  }
+
+  .path-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  .path-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--accent-line);
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .path-index {
+    color: var(--text-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .path h3 {
+    font-size: var(--step-2);
+  }
+
+  .path p {
+    color: var(--text-2);
+  }
+
+  .path .path-stores {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line-2);
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ---------- Internals ---------- */
+
+  .internals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem 2.5rem;
+  }
+
+  .internal {
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--line-2);
+  }
+
+  .internal h3 {
+    font-size: var(--step-1);
+  }
+
+  .internal p {
+    margin-top: 0.6rem;
+    color: var(--text-2);
+  }
+
+  .study-stack {
+    margin-top: 2.5rem;
+  }
+
+  /* ---------- Run it ---------- */
+
+  .run {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    border-radius: var(--radius-xl);
+  }
+
+  .run .eyebrow {
+    margin-bottom: 0.9rem;
+  }
+
+  .run .section-lede {
+    margin-top: 0.9rem;
+  }
+
+  .run-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+
+  .run-code {
+    margin: 0;
+    padding: 1.4rem 1.5rem;
+    overflow-x: auto;
+    border: 1px solid var(--pcb-edge);
+    border-radius: var(--radius);
+    background: var(--pcb-bg);
+    color: #d9e6df;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    line-height: 1.9;
+  }
+
+  .prompt {
+    color: #46f59a;
+    user-select: none;
+  }
+
+  .study-next {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .study-next a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .study-next a:hover {
+    color: var(--accent-text);
+  }
+
+  @media (max-width: 960px) {
+    .study-meta,
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .idea-grid,
+    .run,
+    .paths {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .internals {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .demo-stage {
+      aspect-ratio: 3 / 4;
+    }
+
+    .internals {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tour-tabs {
+      border-radius: var(--radius);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .study-meta,
+    .stats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

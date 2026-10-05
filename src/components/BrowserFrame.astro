@@ -1,0 +1,95 @@
+---
+interface Props {
+  address: string;
+  class?: string;
+  live?: boolean;
+}
+
+const { address, class: className, live = false } = Astro.props;
+---
+
+<div class:list={['browser', className]}>
+  <div class="browser-bar">
+    <span class="browser-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="browser-address">
+      {live && <span class="led" aria-hidden="true" />}
+      <span class="mono">{address}</span>
+    </span>
+    <slot name="actions" />
+  </div>
+  <div class="browser-view">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .browser {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-lg);
+    background: #0b0b0e;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    height: 44px;
+    padding-inline: 1rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    background: #141418;
+    color: #a9aeb8;
+  }
+
+  .browser-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .browser-dots i {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #2c2d33;
+  }
+
+  .browser-dots i:first-child {
+    background: #ff6159;
+  }
+
+  .browser-dots i:nth-child(2) {
+    background: #ffbd2e;
+  }
+
+  .browser-dots i:last-child {
+    background: #28c840;
+  }
+
+  .browser-address {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    margin-inline: auto;
+    padding: 0.28rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.06);
+    font-size: var(--step--2);
+    white-space: nowrap;
+  }
+
+  .browser-address .mono {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .browser-view {
+    position: relative;
+  }
+
+  .browser-view :global(img) {
+    width: 100%;
+  }
+</style>

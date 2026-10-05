@@ -1,0 +1,302 @@
+---
+import Icon from './Icon.astro';
+import { nav } from '../data/site';
+
+const onHome = Astro.url.pathname === '/';
+const link = (id: string) => (onHome ? `#${id}` : `/#${id}`);
+---
+
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="njoku.dev — home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="7" y="5" width="18" height="22" rx="4" />
+        <path d="M7 10H3M7 16H3M7 22H3M25 10h4M25 16h4M25 22h4" />
+        <circle cx="11.5" cy="9.5" r="1.6" />
+      </svg>
+      <span class="brand-name">njoku<span class="brand-tld">.dev</span></span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={link(item.id)} data-nav-link={item.id}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button
+        class="palette-trigger"
+        type="button"
+        data-palette-open
+        aria-label="Open command menu"
+        aria-haspopup="dialog"
+        aria-keyshortcuts="Control+K Meta+K"
+      >
+        <Icon name="search" size={16} />
+        <span class="palette-trigger-label">Jump to…</span>
+        <kbd><span data-mod-key>Ctrl</span>K</kbd>
+      </button>
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
+        <Icon name="sun" class="icon-sun" />
+        <Icon name="moon" class="icon-moon" />
+      </button>
+      <a class="btn btn-small resume-link" href="/resume/">
+        <Icon name="file-text" size={16} />
+        Résumé
+      </a>
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" class="icon-open" />
+        <Icon name="x" class="icon-close" />
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+    <nav class="container" aria-label="Mobile">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={link(item.id)} data-menu-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/resume/" data-menu-link>Résumé</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid transparent;
+    transition:
+      border-color 0.3s,
+      background-color 0.3s;
+  }
+
+  .site-header[data-menu-open] {
+    border-bottom-color: var(--line);
+    background: var(--bg);
+  }
+
+  .site-header[data-scrolled] {
+    border-bottom-color: var(--line);
+    background: var(--header-bg);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
+    backdrop-filter: saturate(160%) blur(16px);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: var(--header-h);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.98rem;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .brand-mark rect {
+    fill: var(--surface-3);
+  }
+
+  .brand-mark circle {
+    fill: var(--accent);
+    stroke: none;
+  }
+
+  .brand:hover .brand-mark {
+    transform: rotate(-8deg) scale(1.05);
+  }
+
+  .brand-tld {
+    color: var(--accent-text);
+  }
+
+  .nav {
+    margin-left: auto;
+  }
+
+  .nav ul {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+  }
+
+  .nav a {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    color: var(--text-2);
+    font-size: var(--step--1);
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+  }
+
+  .nav a:hover {
+    color: var(--text);
+  }
+
+  .nav a[aria-current='true'] {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .palette-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    height: 40px;
+    padding: 0 0.55rem 0 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text-3);
+    font-size: var(--step--1);
+    cursor: pointer;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .palette-trigger:hover {
+    color: var(--text);
+    border-color: var(--line-2);
+  }
+
+  .palette-trigger kbd {
+    display: inline-flex;
+    gap: 0.15em;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface-2);
+    font-size: 0.7rem;
+    color: var(--text-2);
+  }
+
+  .theme-toggle :global(.icon-sun),
+  :global([data-theme='light']) .theme-toggle :global(.icon-moon) {
+    display: none;
+  }
+
+  :global([data-theme='light']) .theme-toggle :global(.icon-sun) {
+    display: block;
+  }
+
+  .menu-toggle,
+  .menu-toggle :global(.icon-close),
+  .menu-toggle[aria-expanded='true'] :global(.icon-open) {
+    display: none;
+  }
+
+  .menu-toggle[aria-expanded='true'] :global(.icon-close) {
+    display: block;
+  }
+
+  .mobile-menu {
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .mobile-menu ul {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.75rem 1.25rem;
+    list-style: none;
+  }
+
+  .mobile-menu a {
+    display: block;
+    padding: 0.85rem 0.25rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (max-width: 1020px) {
+    .palette-trigger-label {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .nav,
+    .palette-trigger kbd {
+      display: none;
+    }
+
+    .header-actions {
+      margin-left: auto;
+    }
+
+    .palette-trigger {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .menu-toggle {
+      display: inline-grid;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .resume-link {
+      display: none;
+    }
+  }
+</style>

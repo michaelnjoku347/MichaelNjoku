@@ -1,0 +1,150 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CommandPalette from '../components/CommandPalette.astro';
+import { education, profile, skills } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  bodyClass?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = `${profile.name} is a Computer Science student at ${education.school} who builds where hardware meets software. Projects, experience, and résumé.`,
+  image = '/og.png',
+  bodyClass,
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL(profile.site);
+const pageTitle = title ? `${title} · ${profile.name}` : `${profile.name} — ${profile.title}`;
+const canonical = new URL(Astro.url.pathname, site);
+const ogImage = new URL(image, site);
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  url: profile.site,
+  jobTitle: profile.title,
+  email: `mailto:${profile.email}`,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Freeport',
+    addressRegion: 'NY',
+    addressCountry: 'US',
+  },
+  affiliation: { '@type': 'CollegeOrUniversity', name: education.school },
+  knowsAbout: skills.slice(0, 4).flatMap((group) => group.items),
+  knowsLanguage: ['en', 'es'],
+  sameAs: [profile.links.github, profile.links.linkedin],
+};
+const personJson = JSON.stringify(person).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        let theme = null;
+        try {
+          theme = localStorage.getItem('theme');
+        } catch {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        root.dataset.theme = theme;
+        root.classList.add('js');
+      })();
+    </script>
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={profile.name} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="njoku.dev" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name} — ${profile.headline}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-mono" />
+
+    <script is:inline type="application/ld+json" set:html={personJson} />
+  </head>
+  <body class={bodyClass}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <CommandPalette />
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  main:focus {
+    outline: none;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 120;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface-3);
+    box-shadow: var(--shadow);
+    color: var(--text);
+    font-size: var(--step--1);
+    font-weight: 500;
+    opacity: 0;
+    transform: translate(-50%, 12px);
+    transition:
+      opacity 0.25s,
+      transform 0.35s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .toast:empty {
+    visibility: hidden;
+  }
+
+  .toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { featuredProject } from '../data/site';
+---
+
+<BaseLayout title="Page not found" description="This page doesn’t exist on njoku.dev." noindex>
+  <section class="container lost">
+    <svg class="lost-trace" viewBox="0 0 420 120" aria-hidden="true">
+      <path d="M10 60 H150 L180 30 H230" />
+      <path d="M262 30 H300 L330 60 H410" class="lost-dim" />
+      <circle cx="10" cy="60" r="7" />
+      <circle cx="410" cy="60" r="7" class="lost-dim-fill" />
+      <path d="M238 18 l16 24 M254 18 l-16 24" class="lost-x" />
+    </svg>
+    <p class="eyebrow">Error 404 · open circuit</p>
+    <h1>This trace doesn’t lead anywhere.</h1>
+    <p class="section-lede">The page you’re looking for was moved, renamed, or never soldered on.</p>
+    <div class="lost-actions">
+      <a class="btn btn-primary" href="/"><Icon name="home" />Back home</a>
+      <a class="btn" href={featuredProject.links.live} target="_blank" rel="noopener">
+        <Icon name="gamepad" />Play Kilobyte instead
+      </a>
+      <button class="btn btn-ghost" type="button" data-palette-open><Icon name="search" />Search the site</button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    justify-items: center;
+    gap: 1.1rem;
+    padding-block: clamp(4rem, 12vw, 8rem);
+    text-align: center;
+  }
+
+  .lost-trace {
+    width: min(100%, 420px);
+    margin-bottom: 1rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .lost-trace circle {
+    fill: var(--accent);
+    stroke: none;
+  }
+
+  .lost-trace .lost-dim {
+    stroke: var(--line-2);
+    stroke-dasharray: 2 10;
+  }
+
+  .lost-trace .lost-dim-fill {
+    fill: var(--line-2);
+  }
+
+  .lost-x {
+    stroke: #ff5d5d;
+    stroke-width: 3.5;
+  }
+
+  .lost h1 {
+    max-width: 16ch;
+    font-size: var(--step-5);
+    letter-spacing: -0.04em;
+  }
+
+  .lost-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>

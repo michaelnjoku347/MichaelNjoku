@@ -6,11 +6,11 @@ import { getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BrowserFrame from '../../components/BrowserFrame.astro';
 import Icon, { type IconName } from '../../components/Icon.astro';
-import findShot from '../../content/projects/images/kilobyte/search.webp';
+import shelfShot from '../../content/projects/images/kilobyte/shelf.webp';
 import catalogShot from '../../content/projects/images/kilobyte/catalog.webp';
 import playShot from '../../content/projects/images/kilobyte/play.webp';
+import wasmShot from '../../content/projects/images/kilobyte/wasm.webp';
 import publishShot from '../../content/projects/images/kilobyte/publish.webp';
-import hostingShot from '../../content/projects/images/kilobyte/hosting.webp';
 
 const entry = await getEntry('projects', 'kilobyte');
 if (!entry) throw new Error('src/content/projects/kilobyte.md is missing.');
@@ -21,39 +21,39 @@ const repo = kilobyte.repo ?? 'https://github.com/michaelnjoku347/KiloByte';
 
 const tour = [
   {
-    id: 'find',
-    label: 'Find',
-    image: findShot,
-    alt: 'Kilobyte search results for the letter e: fifteen matching games shown as colorful cover cards with genre labels, star ratings, and Play and Save buttons.',
-    caption: 'Search from anywhere with ⌘K or /. Every game gets a color-coded cover, a genre, and a star rating.',
+    id: 'shelf',
+    label: 'Play',
+    image: shelfShot,
+    alt: 'Kilobyte’s Play screen, led by Cinder Field, a first-person WebGL2 match running in the tab at 60 fps, tagged Versus bots and 16+, with Play this and Details buttons.',
+    caption: 'The shelf opens on Cinder Field, a WebGL2 match drawn in this tab. Versus bots works with no account.',
   },
   {
     id: 'catalog',
     label: 'Catalog',
     image: catalogShot,
-    alt: 'Kilobyte’s All games page: a ranked table of games with genre filters at the top and a rating and Play button on each row.',
-    caption: 'The full catalog, ranked by star rating and filterable by genre.',
+    alt: 'Kilobyte’s All games table, ranked by star rating, with genre chips and build filters for HTML, WASM, and Cart. Cinder Field, Dock Ledger, 2048, and Kiln Rally are the first rows.',
+    caption: 'The full catalog, ranked by star rating and filterable by genre and by runtime: HTML, WebAssembly, or cart.',
   },
   {
     id: 'play',
-    label: 'Play',
+    label: 'WebGL',
     image: playShot,
-    alt: 'Star Nibbler running in Kilobyte’s player, labeled Arcade, Casual, JSON cart, 640 B, with Copy link and Remix buttons.',
-    caption: 'Star Nibbler is a 640-byte JSON cart running on the built-in canvas engine. Copy a link to share it, or remix it.',
+    alt: 'Cinder Field running in Kilobyte’s player: a dark yard of teal and amber blocks, a 60 fps counter, carbine ammo, and a prompt that says Click to look.',
+    caption: 'Cinder Field stays on the page, not in an iframe. Click to look, WASD to move, and Esc releases the mouse before it leaves.',
+  },
+  {
+    id: 'wasm',
+    label: 'WASM',
+    image: wasmShot,
+    alt: 'Kiln Rally running in Kilobyte, labeled Mashup, Sports, Arcade, WebAssembly, 754 KB. An orange puck and falling bricks sit on a brown court.',
+    caption: 'Kiln Rally is C++ and SDL2, compiled with Emscripten. The same player frame loads its WebAssembly build.',
   },
   {
     id: 'publish',
-    label: 'Publish',
+    label: 'Make',
     image: publishShot,
-    alt: 'Kilobyte’s Make page titled “Publish a game. We store a pointer.”, with tabs for Upload files, Connect GitHub, and Prompt a cart.',
-    caption: 'Three ways in: upload files, connect the GitHub repo that already hosts a game, or prompt a tiny JSON cart.',
-  },
-  {
-    id: 'hosting',
-    label: 'Hosting',
-    image: hostingShot,
-    alt: 'Kilobyte’s hosting page titled “You do not host the games. You host the catalog.”, comparing 40 MB for a stored build with 0 B for a GitHub-connected game.',
-    caption: 'The math behind the idea: one WebGL build can weigh 40 MB, while a GitHub-connected game costs the server 0 B.',
+    alt: 'Kilobyte’s Make page titled “Publish a game. We store a pointer.”, with tabs for Upload files, Connect GitHub, and Prompt a cart, and a drop zone for a zip or folder.',
+    caption: 'Three ways in: upload a WebGL or HTML build, connect the GitHub repo that already hosts one, or prompt a tiny JSON cart.',
   },
 ];
 
@@ -61,20 +61,20 @@ const paths: { icon: IconName; title: string; body: string; stores: string }[] =
   {
     icon: 'github',
     title: 'Connect a GitHub repo',
-    body: 'Paste owner/repo. Kilobyte reads the public GitHub API, finds the game’s index.html, and plays it through jsDelivr or GitHub Pages. It never receives a zip.',
+    body: 'Paste owner/repo. Kilobyte reads the public GitHub API, finds the game’s index.html, and plays a Unity, Godot, or custom export through jsDelivr or GitHub Pages. It never receives a zip.',
     stores: 'A pointer to the repo',
   },
   {
     icon: 'box',
     title: 'Upload a build',
-    body: 'Drop in HTML, a folder, or a zip. fflate unpacks it in the browser, the files go into IndexedDB, and a service worker serves them like a tiny web server.',
-    stores: 'Nothing. It stays on the creator’s device',
+    body: 'Drop in a zip, an index.html, or a folder, including a WebAssembly build. fflate unpacks it in the browser, the files go into IndexedDB, and a service worker serves them. A cloud copy is optional and stays off until a Supabase project is configured.',
+    stores: 'Nothing, on this demo. It stays on the device',
   },
   {
     icon: 'zap',
     title: 'Prompt a JSON cart',
-    body: 'Describe a game in a line. A seeded generator picks the genre, theme, and rules, or creators can opt into Gemini with their own key. A canvas engine runs the result.',
-    stores: 'The cart itself, often under 1 KB',
+    body: 'Describe a game in a line. A seeded generator writes a tiny recipe on the device, and a canvas engine runs it. The house carts are the small end of the shelf.',
+    stores: 'The cart itself, under 2 KB',
   },
 ];
 
@@ -84,31 +84,31 @@ const internals = [
     body: 'React 19 and TypeScript on Vite, with a hash router, so the whole app runs from any static host. That’s how it lives inside this site at /kilobyte/.',
   },
   {
+    title: 'WebGL in the tab',
+    body: 'Cinder Field is its own chunk and draws on a canvas in the page. Versus bots needs no account. A second player would use an optional lobby, and the page says so when that is not configured.',
+  },
+  {
+    title: 'One C++ game, as WebAssembly',
+    body: 'Kiln Rally is SDL2 compiled with Emscripten. The player opens index.html, index.js, and index.wasm in an iframe, and uploaded .wasm files are served as application/wasm.',
+  },
+  {
     title: 'Games in a URL',
     body: 'Share links gzip a cart with the browser’s CompressionStream and pack it into the hash (#/c/…). The link is the game, so nothing has to be saved anywhere.',
   },
   {
-    title: 'A tiny game engine',
-    body: 'JSON carts describe shapes, behaviors, and goals; a small canvas engine runs them on requestAnimationFrame.',
-  },
-  {
-    title: 'Keys never leave the browser',
-    body: 'Optional Gemini and GitHub tokens are typed by the visitor, kept in localStorage, and only sent to those APIs. There’s no proxy to pay for.',
-  },
-  {
-    title: 'A catalog people can use',
-    body: 'Five-star ratings, genre filters, saves, keyboard search, light and dark appearances, and an optional on-device profile.',
+    title: 'This demo stays local',
+    body: 'Cloud accounts, uploaded copies, and online lobbies need a free Supabase project. Those keys are not in this build, so play, saves, and uploads stay in the browser.',
   },
   {
     title: 'Checked on every push',
-    body: 'GitHub Actions runs oxlint, 17 Vitest unit tests, and a production build on each change, and a Puppeteer smoke test clicks through the real app.',
+    body: 'GitHub Actions installs Emscripten, runs oxlint and Vitest, rebuilds the WebAssembly game, and builds the site. The job fails if a secret lands in the browser bundle.',
   },
 ];
 ---
 
 <BaseLayout
   title="Kilobyte — case study"
-  description="Kilobyte is a browser-game catalog by Michael Njoku that never hosts the games. Play the live demo and see how it works."
+  description="Kilobyte is a browser game launcher by Michael Njoku. Play Cinder Field and Kiln Rally in the tab, and see how publishing works."
 >
   <article class="study">
     <header class="study-hero">
@@ -138,7 +138,7 @@ const internals = [
           <div><dt>Role</dt><dd>Designer &amp; developer</dd></div>
           <div><dt>Year</dt><dd>{kilobyte.year}</dd></div>
           <div><dt>Platform</dt><dd>Static web app</dd></div>
-          <div><dt>Core stack</dt><dd>React 19 · TypeScript · Vite</dd></div>
+          <div><dt>Core stack</dt><dd>React 19 · WebGL2 · WebAssembly</dd></div>
         </dl>
       </div>
     </header>
@@ -182,7 +182,7 @@ const internals = [
     <section class="container study-section" aria-labelledby="tour-title">
       <div class="study-head" data-reveal>
         <p class="eyebrow"><span class="eyebrow-index">02</span>Tour</p>
-        <h2 id="tour-title">Five screens, one idea.</h2>
+        <h2 id="tour-title">Five screens, one launcher.</h2>
       </div>
 
       <div class="tour" data-reveal>
@@ -233,18 +233,18 @@ const internals = [
       <div class="idea-grid">
         <div class="study-head" data-reveal>
           <p class="eyebrow"><span class="eyebrow-index">03</span>The idea</p>
-          <h2 id="idea-title">Host the catalog, not the games.</h2>
+          <h2 id="idea-title">Launch it here. Store a pointer.</h2>
         </div>
         <div class="idea-copy" data-reveal style="--reveal-delay: 1">
           <p>
-            Game files are heavy. A single Unity or WebGL build can weigh 40 MB, so a site that stored every upload
-            would turn into a hosting bill fast.
+            A full engine export is heavy. One WebGL build can weigh 40 MB, so a site that stored every upload would
+            turn into a hosting bill fast.
           </p>
           <p>
-            Kilobyte flips that around. It keeps only the listing (title, genre, rating, and a pointer to where the game
-            lives), while the files stay on GitHub or on the creator’s own machine. There’s no server, no database, and
-            no paid AI proxy: visitors play for free, creators publish for free, and the bill stays at hosting a
-            frontend.
+            Kilobyte plays that build in the tab and keeps the listing: title, genre, rating, and a pointer. Creator
+            files stay on GitHub or on that person’s machine. A few small house games ship with the site, including the
+            WebGL match and one WebAssembly demo. A free Supabase project can hold accounts and uploads later. This
+            demo does not include those keys, so the bill stays at a static frontend.
           </p>
         </div>
       </div>

@@ -32,14 +32,27 @@ function getBundle(id) {
   )
 }
 
-// The worker's scope is wherever the app is deployed: "/" locally, "/kilobyte/" on a subpath.
-const LOCAL_GAME_PREFIX = `${new URL(self.registration.scope).pathname}local-game/`
+const SHELL = 'kilobyte-shell-v1'
+const DEV_HOST = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1'
+
+self.addEventListener('install', (event) => {
+  if (DEV_HOST) return
+  event.waitUntil(
+    caches.open(SHELL).then((cache) =>
+      cache.addAll(['./', './index.html', './manifest.webmanifest', './favicon.svg']).catch(() => undefined),
+    ),
+  )
+})
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
-  if (!url.pathname.startsWith(LOCAL_GAME_PREFIX)) return
-  const match = url.pathname.slice(LOCAL_GAME_PREFIX.length).match(/^([^/]+)\/(.*)$/)
-  if (!match) return
+  const match = url.pathname.match(/\/local-game\/([^/]+)\/(.*)$/)
+  if (!match) {
+    if (DEV_HOST || event.request.method !== 'GET' || url.origin !== self.location.origin) return
+    if (url.pathname.includes('/@') || url.pathname.startsWith('/src/')) return
+    event.respondWith(shellCache(event.request))
+    return
+  }
   const id = decodeURIComponent(match[1])
   let path = decodeURIComponent(match[2] || 'index.html')
   if (!path || path.endsWith('/')) path += 'index.html'
@@ -57,3 +70,20 @@ self.addEventListener('fetch', (event) => {
     }),
   )
 })
+
+async function shellCache(request) {
+  const cache = await caches.open(SHELL)
+  try {
+    const fresh = await fetch(request)
+    if (fresh.ok) void cache.put(request, fresh.clone())
+    return fresh
+  } catch {
+    const cached = await cache.match(request)
+    if (cached) return cached
+    if (request.mode === 'navigate') {
+      const shell = (await cache.match('./index.html')) || (await cache.match('index.html'))
+      if (shell) return shell
+    }
+    return new Response('Offline. Open Kilobyte once online so the match and house games can be stored.', { status: 503 })
+  }
+}

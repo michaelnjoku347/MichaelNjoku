@@ -68,7 +68,7 @@ npm run kilobyte                            # latest main from GitHub
 KILOBYTE_DIR=../KiloByte npm run kilobyte   # or a local checkout
 ```
 
-The script applies [`scripts/kilobyte-subpath.patch`](scripts/kilobyte-subpath.patch) so Kilobyte’s service worker and game files work from `/kilobyte/` instead of the site root. Once Kilobyte reads `import.meta.env.BASE_URL` itself, the script skips the patch automatically. Commit the updated `public/kilobyte/` folder.
+The script applies [`scripts/kilobyte-subpath.patch`](scripts/kilobyte-subpath.patch) only if Kilobyte still assumes it is served from `/`. Current Kilobyte prefixes those paths with Vite’s `BASE_URL`, so the script skips the patch. Commit the updated `public/kilobyte/` folder.
 
 ## Other scripts
 

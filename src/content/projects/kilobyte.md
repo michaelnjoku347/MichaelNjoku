@@ -1,27 +1,27 @@
 ---
 title: Kilobyte
-summary: A browser-game catalog that never hosts the games.
+summary: A browser game launcher. Press Play and it runs in this tab.
 year: 2026
 type: Personal project
 featured: true
 order: 1
-cover: ./images/kilobyte/search.webp
-coverAlt: Kilobyte’s Find a game screen, a grid of colorful game covers such as Dock Ledger, 2048, Void Line, and Star Nibbler, each with a star rating and Play and Save buttons.
+cover: ./images/kilobyte/shelf.webp
+coverAlt: Kilobyte’s Play screen, led by Cinder Field, a first-person WebGL2 match running in the tab at 60 fps, with Play this and Details buttons.
 demo: /kilobyte/
 demoLabel: Play the live demo
 repo: https://github.com/michaelnjoku347/KiloByte
 caseStudy: /projects/kilobyte/
-tags: [React 19, TypeScript, Vite, IndexedDB, Service Workers, Canvas API, GitHub REST API, Gemini API, Vitest, Puppeteer, GitHub Actions]
+tags: [React 19, TypeScript, Vite, WebGL2, WebAssembly, Emscripten, IndexedDB, Service Workers, GitHub Actions]
 stats:
-  - { value: '15', label: games in the house library }
+  - { value: '19', label: games in the house library }
   - { value: '3', label: ways to publish a game }
-  - { value: '0 B', label: of game files on the server }
-  - { value: '640 B', label: smallest playable cart }
+  - { value: '1', label: C++ game compiled to WebAssembly }
+  - { value: '0 B', label: of a GitHub game on the server }
 highlights:
-  - 'Three publishing paths: public GitHub repos played through jsDelivr or GitHub Pages, zip/HTML uploads kept in the creator’s IndexedDB and served by a service worker, and JSON “carts” run by a built-in canvas engine.'
-  - Fully static, with no server, no database, and no paid AI proxy. Optional Gemini and GitHub tokens never leave the visitor’s browser.
-  - A catalog ranked by five-star ratings, with genre filters, keyboard search (Ctrl/⌘ K or /), saves, light and dark appearances, and an optional on-device profile.
-  - Vitest unit tests, a Puppeteer smoke test, oxlint, and a GitHub Actions pipeline that lints, tests, and builds every push.
+  - 'Cinder Field, the lead game, is a WebGL2 match drawn in the tab. Versus bots works offline. Kiln Rally is C++ and SDL2 compiled to WebAssembly and played in the same frame.'
+  - 'Three publishing paths: a public GitHub repo played through jsDelivr or GitHub Pages, a zip or folder kept in the visitor’s IndexedDB and served by a service worker, and a JSON cart run by a built-in canvas engine.'
+  - 'A catalog ranked by star rating, with filters for genre and runtime (HTML, WASM, or cart). Optional cloud accounts and online lobbies need a free Supabase project; this demo does not include those keys.'
+  - 'GitHub Actions lints with oxlint, runs Vitest, builds the WebAssembly game with Emscripten, and builds the site on every push.'
 ---
 
-Pick a title, press Play, or publish your own by connecting a GitHub repo, uploading a build that stays in your browser, or minting a tiny JSON cart. The site only stores the catalog, so hosting costs stay at a static frontend.
+The shelf opens on Cinder Field, a first-person WebGL2 match. Behind it are HTML games, Kiln Rally (C++ compiled to WebAssembly), and tiny JSON carts. Publish by uploading a build, connecting a GitHub repo, or prompting a cart. This copy ships without a cloud account, so play stays in the browser.

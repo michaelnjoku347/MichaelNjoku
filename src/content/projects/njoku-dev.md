@@ -3,7 +3,7 @@ title: njoku.dev
 summary: This portfolio, rebuilt from scratch with Astro.
 year: 2026
 type: Personal project
-order: 2
+order: 3
 demo: https://njoku.dev
 repo: https://github.com/michaelnjoku347/MichaelNjoku
 tags: [Astro, TypeScript, CSS, Vercel]

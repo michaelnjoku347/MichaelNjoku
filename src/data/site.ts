@@ -19,11 +19,11 @@ export const profile = {
     'I study Computer Science at Farmingdale State College. I love expressing my ideas in code, building alongside other developers, and teaching what I know. This is where I keep everything I make.',
   /** The summary at the top of the résumé page. */
   summary:
-    'Computer Science student at Farmingdale State College (Class of 2029) who loves expressing ideas in code, building alongside other developers, and teaching what I know. Currently interning at Venture Starters and building Kilobyte, a browser game launcher.',
+    'Computer Science student at Farmingdale State College (Class of 2029) who loves expressing ideas in code, building alongside other developers, and teaching what I know. Currently interning at Venture Starters and building OrbitScope, a satellite globe, and Kilobyte, a browser game launcher.',
   about: [
     'I’m Michael, a Computer Science student at Farmingdale State College (Class of 2029) from Freeport, NY. I like understanding how things work all the way down, so my interests run from Java, Python, and Lua to digital circuits and PC diagnostics.',
     'Right now I’m interning with Venture Starters, analyzing live startup pitches and learning how early-stage teams form, iterate, and scale toward funding. On campus I’m part of the Artificial Intelligence Club and the Cyber Security Club.',
-    'My latest project is Kilobyte, a browser game launcher. Press Play and the game runs in the tab, including a WebGL match and a C++ game compiled to WebAssembly. I learn best by building, so there’s always another project on the way.',
+    'Lately I’ve been building OrbitScope, a 3D globe of Starlink, GPS, and the ISS, and Kilobyte, a browser game launcher you can play in the tab. I learn best by building, so there’s always another project on the way.',
   ],
   motto: 'Rome wasn’t built in a day.',
   spokenLanguages: ['English', 'Spanish (conversational)'],

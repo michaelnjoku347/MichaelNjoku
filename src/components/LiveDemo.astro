@@ -1,0 +1,149 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import BrowserFrame from './BrowserFrame.astro';
+import Icon from './Icon.astro';
+import { demoAddress } from '../lib/projects';
+
+interface Props {
+  demo: string;
+  title: string;
+  poster: ImageMetadata;
+  posterAlt?: string;
+  heading?: string;
+  lede?: string;
+  buttonLabel?: string;
+  note?: string;
+  eyebrow?: string;
+}
+
+const {
+  demo,
+  title,
+  poster,
+  posterAlt = '',
+  heading = 'Try it right here.',
+  lede = 'This is the real app in your browser, not a recording. Load it below or open it full-screen.',
+  buttonLabel = 'Load the live demo',
+  note = 'Runs in your browser',
+  eyebrow = 'Try it',
+} = Astro.props;
+---
+
+<section class="live-demo" aria-labelledby="live-demo-title">
+  <div class="live-demo-head" data-reveal>
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 id="live-demo-title">{heading}</h2>
+    <p class="section-lede">{lede}</p>
+  </div>
+
+  <div data-reveal>
+    <BrowserFrame address={demoAddress(demo)} live class="live-demo-browser">
+      <a slot="actions" class="live-demo-open" href={demo} target="_blank" rel="noopener">
+        Open in a new tab <Icon name="arrow-up-right" size={14} />
+      </a>
+      <div class="demo-stage" data-demo={demo} data-demo-title={`${title} live demo`}>
+        <Image
+          class="demo-poster"
+          src={poster}
+          alt={posterAlt}
+          widths={[960, 1440, 1920]}
+          sizes="(min-width: 1180px) 1160px, 100vw"
+          loading="lazy"
+        />
+        <div class="demo-cover">
+          <button class="btn btn-primary btn-lg" type="button" data-demo-load>
+            <Icon name="play" />
+            {buttonLabel}
+          </button>
+          <p class="mono">{note}</p>
+        </div>
+      </div>
+    </BrowserFrame>
+  </div>
+</section>
+
+<style>
+  .live-demo {
+    margin-block: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .live-demo-head {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 44rem;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .live-demo-head h2 {
+    font-size: var(--step-4);
+  }
+
+  .live-demo-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #d7dbe2;
+    font-size: var(--step--2);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .live-demo-open:hover {
+    color: #fff;
+  }
+
+  .demo-stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: #09090b;
+  }
+
+  .demo-stage :global(.demo-poster) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    filter: saturate(0.9) brightness(0.55) blur(1px);
+  }
+
+  .demo-cover {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.9rem;
+    padding: 1.5rem;
+    color: #e6e8ec;
+    text-align: center;
+  }
+
+  .demo-cover p {
+    font-size: var(--step--2);
+    opacity: 0.8;
+  }
+
+  .demo-stage[data-loaded] :global(.demo-poster),
+  .demo-stage[data-loaded] .demo-cover {
+    display: none;
+  }
+
+  .demo-stage :global(.demo-frame) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
+
+  @media (max-width: 720px) {
+    .demo-stage {
+      aspect-ratio: 10 / 14;
+    }
+  }
+</style>

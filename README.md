@@ -1,6 +1,6 @@
 # njoku.dev
 
-Michael Njoku’s personal site. It lists his projects (with a playable [Kilobyte](https://github.com/michaelnjoku347/KiloByte) demo at [`/kilobyte/`](https://njoku.dev/kilobyte/)), his experience, and a printable résumé.
+Michael Njoku’s personal site. It lists his projects — with playable demos for [Kilobyte](https://njoku.dev/kilobyte/), [Cubelight](https://njoku.dev/cubelight/) (from OrbitScope), and [Agent Allowance](https://njoku.dev/agent-allowance/) — his experience, and a printable résumé.
 
 You don’t need to know Astro to keep this up to date. Astro is the tool that turns the files in this repo into a website. Each page is a mix of HTML and a little JavaScript at the top; when you run a build, Astro writes plain HTML, CSS, and JS that Vercel hosts. There is no database. Changing a Markdown file and pushing to GitHub is enough for a new project to show up.
 
@@ -13,6 +13,8 @@ You don’t need to know Astro to keep this up to date. Astro is the tool that t
 | Agent Allowance | `/projects/agent-allowance/` |
 | Kilobyte case study | `/projects/kilobyte/` |
 | Kilobyte live demo | `/kilobyte/` |
+| Cubelight live demo | `/cubelight/` |
+| Agent Allowance live demo | `/agent-allowance/` |
 | Résumé (print or save as PDF) | `/resume/` |
 
 ## Run it on your computer
@@ -71,6 +73,28 @@ KILOBYTE_DIR=../KiloByte npm run kilobyte   # or a local checkout
 ```
 
 The script applies [`scripts/kilobyte-subpath.patch`](scripts/kilobyte-subpath.patch) only if Kilobyte still assumes it is served from `/`. Current Kilobyte prefixes those paths with Vite’s `BASE_URL`, so the script skips the patch. Commit the updated `public/kilobyte/` folder.
+
+## Update the Cubelight demo
+
+Cubelight is the WASM ray tracer from [OrbitScope](https://github.com/michaelnjoku347/OrbitScope). A copy lives in `public/cubelight/`:
+
+```bash
+npm run cubelight                              # latest OrbitScope main
+ORBITSCOPE_DIR=../OrbitScope npm run cubelight # or a local checkout
+```
+
+Commit the updated `public/cubelight/` folder.
+
+## Update the Agent Allowance demo
+
+The dashboard is prebuilt into `public/agent-allowance/`. A small browser mock (`portfolio-mock.js`) answers `/api/*` so Run agent, approvals, freeze, and Eve work without a Node server — payments stay simulated and local.
+
+```bash
+npm run agent-allowance                                      # latest main from GitHub
+AGENT_ALLOWANCE_DIR=../Agent-allowance npm run agent-allowance
+```
+
+Commit the updated `public/agent-allowance/` folder.
 
 ## Other scripts
 

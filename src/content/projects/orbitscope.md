@@ -6,6 +6,8 @@ type: Personal project
 order: 3
 cover: ./images/orbitscope.webp
 coverAlt: OrbitScope’s globe centered on the Americas, ringed with teal Starlink dots and an orange NY marker. A panel on the right searches by name and filters all, Starlink, GPS, and the ISS.
+demo: /cubelight/
+demoLabel: Try Cubelight
 repo: https://github.com/michaelnjoku347/OrbitScope
 tags: [Java 21, Spring Boot, Orekit, Cesium, TypeScript, Vite, Rust, WebAssembly]
 highlights:
@@ -17,7 +19,7 @@ highlights:
 
 OrbitScope puts the live satellite catalog on a globe. The dots are Starlink, GPS, and the ISS. The orange marker is New York, and pass times are calculated from there.
 
-It is not deployed yet. The code and screenshots are on [GitHub](https://github.com/michaelnjoku347/OrbitScope).
+The globe API is not hosted here yet. **Cubelight**, the WASM ray tracer from the same repo, runs live on this site at [/cubelight/](/cubelight/). The full source is on [GitHub](https://github.com/michaelnjoku347/OrbitScope).
 
 ## What you can do with it
 
@@ -45,6 +47,8 @@ The same repo now includes **Cubelight**, a Rust ray tracer compiled to WebAssem
 - **Systems:** direct light, Whitted (reflections and refraction), path tracing, plus normals, depth, occlusion, and albedo.
 - **Formats:** gamma, Reinhard, ACES, punchy, linear, and false color. A format change regrades samples already traced, so it updates immediately.
 - Samples stack while the view sits still. Move anything and it starts over.
+
+On this site, open [/cubelight/](/cubelight/) or use the live demo above. From the OrbitScope repo:
 
 ```bash
 cd tracer

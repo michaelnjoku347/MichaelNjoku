@@ -7,7 +7,9 @@ import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BrowserFrame from '../../components/BrowserFrame.astro';
 import Icon from '../../components/Icon.astro';
+import LiveDemo from '../../components/LiveDemo.astro';
 import ProjectCover from '../../components/ProjectCover.astro';
+import cubelightPoster from '../../content/projects/images/orbitscope-cubelight.webp';
 import { profile } from '../../data/site';
 import { demoAddress, getProjects, isThisSite, type Project } from '../../lib/projects';
 
@@ -29,6 +31,28 @@ const { project, next } = Astro.props;
 const { title, summary, year, type, tags, cover, coverAlt, demo, demoLabel, repo, draft } = project.data;
 const { Content } = await render(project);
 const liveDemo = demo && !isThisSite(project) ? demo : undefined;
+const embeddedDemo = Boolean(liveDemo && liveDemo.startsWith('/') && cover);
+const demoCopy =
+  project.id === 'agent-allowance'
+    ? {
+        heading: 'Try the allowance here.',
+        lede: 'Same dashboard as the hackathon demo. Run agent walks the story with simulated payments; approvals use a labeled simulated Ledger signature. Nothing leaves your browser.',
+        buttonLabel: 'Load the live demo',
+        note: 'Simulated payments · stays in this browser',
+      }
+    : project.id === 'orbitscope'
+      ? {
+          heading: 'Try Cubelight here.',
+          lede: 'Cubelight is the WASM ray tracer that ships with OrbitScope. Drag to orbit, switch Whitted and path tracing, and regrade the film format while samples stack.',
+          buttonLabel: 'Load Cubelight',
+          note: 'Rust compiled to WebAssembly · runs in this tab',
+        }
+      : {
+          heading: 'Try it right here.',
+          lede: 'This is the real app in your browser, not a recording. Load it below or open it full-screen.',
+          buttonLabel: demoLabel ?? 'Load the live demo',
+          note: 'Runs in your browser',
+        };
 ---
 
 <BaseLayout title={title} description={`${summary} A project by ${profile.name}.`} noindex={draft}>
@@ -77,7 +101,7 @@ const liveDemo = demo && !isThisSite(project) ? demo : undefined;
       <figure class="project-figure" data-reveal>
         {
           cover ? (
-            <BrowserFrame address={demoAddress(demo ?? `/projects/${project.id}/`)}>
+            <BrowserFrame address={demoAddress(demo ?? `/projects/${project.id}/`)} live={Boolean(liveDemo)}>
               <Image
                 src={cover}
                 alt={coverAlt ?? ''}
@@ -91,6 +115,25 @@ const liveDemo = demo && !isThisSite(project) ? demo : undefined;
           )
         }
       </figure>
+
+      {
+        embeddedDemo && cover && liveDemo && (
+          <LiveDemo
+            demo={liveDemo}
+            title={title}
+            poster={project.id === 'orbitscope' ? cubelightPoster : cover}
+            posterAlt={
+              project.id === 'orbitscope'
+                ? 'Cubelight’s browser UI: a Whitted render of three cubes on a checker floor, with system and format controls on the right.'
+                : coverAlt
+            }
+            heading={demoCopy.heading}
+            lede={demoCopy.lede}
+            buttonLabel={demoCopy.buttonLabel}
+            note={demoCopy.note}
+          />
+        )
+      }
 
       <div class="project-columns">
         <div class="prose" data-reveal>

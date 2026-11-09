@@ -10,6 +10,7 @@ You don’t need to know Astro to keep this up to date. Astro is the tool that t
 | All projects | `/projects/` |
 | One project | `/projects/your-file-name/` |
 | OrbitScope | `/projects/orbitscope/` |
+| Agent Allowance | `/projects/agent-allowance/` |
 | Kilobyte case study | `/projects/kilobyte/` |
 | Kilobyte live demo | `/kilobyte/` |
 | Résumé (print or save as PDF) | `/resume/` |

@@ -23,7 +23,7 @@ const check = (ok, message) => {
   if (!ok) failures.push(message);
 };
 
-async function open(path, { width = 1440, height = 900, mobile = false } = {}) {
+async function open(path, { width = 1440, height = 900, mobile = false, waitUntil = 'networkidle0', timeout = 30000 } = {}) {
   const page = await browser.newPage();
   await page.setViewport({ width, height, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: mobile ? 2 : 1 });
   const errors = [];
@@ -38,7 +38,7 @@ async function open(path, { width = 1440, height = 900, mobile = false } = {}) {
       errors.push(`${response.status()}: ${url}`);
     }
   });
-  const response = await page.goto(`${server.origin}${path}`, { waitUntil: 'networkidle0' });
+  const response = await page.goto(`${server.origin}${path}`, { waitUntil, timeout });
   return { page, errors, status: response?.status() ?? 0 };
 }
 
@@ -180,7 +180,38 @@ try {
 
   console.log('\n/orbitscope/ (demo)');
   {
-    const { page, errors, status } = await open('/orbitscope/');
+    // Cesium keeps requesting imagery tiles, so networkidle0 never settles.
+    const { page, errors, status } = await open('/orbitscope/', { waitUntil: 'load', timeout: 60000 });
+    check(status === 200, `responds 200 (got ${status})`);
+    await page.waitForFunction(() => {
+      const statusText = document.getElementById('status')?.textContent ?? '';
+      return /\d[\d,]*\s*sats/i.test(statusText);
+    }, { timeout: 60000 });
+    const title = await page.title();
+    check(title.includes('OrbitScope'), `OrbitScope globe boots (title: ${title})`);
+    check((await page.$eval('h1', (h1) => h1.textContent)).toLowerCase().includes('starlink'), 'globe HUD mentions Starlink');
+    const statusText = await page.$eval('#status', (el) => el.textContent);
+    check(/\d/.test(statusText), `globe status shows satellite count (${statusText})`);
+    const catalog = await page.evaluate(async () => {
+      const response = await fetch('/satellites');
+      const body = await response.json();
+      return { status: response.status, count: body.satellites?.length ?? 0 };
+    });
+    check(catalog.status === 200 && catalog.count > 1000, `snapshot catalog loads (${catalog.count} sats)`);
+    await page.screenshot({ path: `${shots}/orbitscope-demo.png` });
+    const orbitscopeErrors = errors.filter(
+      (message) =>
+        !/favicon\.ico/i.test(message) &&
+        !/Failed to load resource:.*favicon/i.test(message) &&
+        !/net::ERR_ABORTED/i.test(message),
+    );
+    check(orbitscopeErrors.length === 0, `no console or network errors${orbitscopeErrors.length ? `:\n      ${orbitscopeErrors.join('\n      ')}` : ''}`);
+    await page.close();
+  }
+
+  console.log('\n/orbitscope/cubelight/ (demo)');
+  {
+    const { page, errors, status } = await open('/orbitscope/cubelight/', { waitUntil: 'load', timeout: 60000 });
     check(status === 200, `responds 200 (got ${status})`);
     await page.waitForFunction(() => {
       const el = document.getElementById('rebate-spp');
@@ -188,14 +219,12 @@ try {
       const n = parseInt(el.textContent, 10);
       return Number.isFinite(n) && n >= 1;
     }, { timeout: 45000 });
-    const title = await page.title();
-    check(title.includes('OrbitScope'), `OrbitScope demo boots (title: ${title})`);
-    check((await page.$eval('h1', (h1) => h1.textContent)).includes('OrbitScope'), 'demo brands as OrbitScope');
-    const wasm = await page.evaluate(() => fetch('/orbitscope/cubelight.wasm').then((r) => r.status));
-    check(wasm === 200, 'cubelight.wasm responds 200 under /orbitscope/');
-    await page.screenshot({ path: `${shots}/orbitscope-demo.png` });
-    const orbitscopeErrors = errors.filter((message) => !/favicon\.ico/i.test(message));
-    check(orbitscopeErrors.length === 0, `no console or network errors${orbitscopeErrors.length ? `:\n      ${orbitscopeErrors.join('\n      ')}` : ''}`);
+    check((await page.title()).includes('OrbitScope'), 'Cubelight page stays under OrbitScope');
+    const wasm = await page.evaluate(() => fetch('/orbitscope/cubelight/cubelight.wasm').then((r) => r.status));
+    check(wasm === 200, 'cubelight.wasm responds 200');
+    await page.screenshot({ path: `${shots}/orbitscope-cubelight-demo.png` });
+    const cubeErrors = errors.filter((message) => !/favicon\.ico/i.test(message));
+    check(cubeErrors.length === 0, `no console or network errors${cubeErrors.length ? `:\n      ${cubeErrors.join('\n      ')}` : ''}`);
     await page.close();
   }
 

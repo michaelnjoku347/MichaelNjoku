@@ -32,7 +32,11 @@ export default defineConfig({
   integrations: [
     sitemap({
       // The demo is a prebuilt app in public/, so Astro does not know about it.
-      customPages: ['https://njoku.dev/kilobyte/'],
+      customPages: [
+        'https://njoku.dev/kilobyte/',
+        'https://njoku.dev/cubelight/',
+        'https://njoku.dev/agent-allowance/',
+      ],
       filter: (page) => !page.includes('/404') && !page.includes('/contact/thanks'),
     }),
   ],

@@ -6,6 +6,8 @@ type: Hackathon
 order: 2
 cover: ./images/agent-allowance.webp
 coverAlt: Agent Allowance’s home screen. A teal gauge disk shows 0.14 RLUSD left of a 0.20 budget, with limit tiles, a payment path, and recent activity underneath.
+demo: /agent-allowance/
+demoLabel: Open the live demo
 repo: https://github.com/michaelnjoku347/Agent-allowance
 tags: [JavaScript, Node.js, React 19, Vite, XRPL, x402, AP4M, Ledger, Express, Amazon Bedrock]
 highlights:
@@ -19,7 +21,7 @@ Would you give an AI your credit card? Agent Allowance is a spending account for
 
 Payments are **AP4M x402** vouchers settling **RLUSD** on **XRPL EVM Testnet** (chain ID `1449000`). Built for the Mastercard × XRPL Hackathon, **Agentic Finance** track.
 
-It is not hosted as a permanent public demo from this site. The code, screenshots, and deploy notes are on [GitHub](https://github.com/michaelnjoku347/Agent-allowance).
+A playable public demo runs on this site at [/agent-allowance/](/agent-allowance/). Approvals use a labeled **simulated Ledger signature**, and Run agent records simulated payments in your browser — nothing is broadcast. The full source is on [GitHub](https://github.com/michaelnjoku347/Agent-allowance).
 
 ## What you can do
 

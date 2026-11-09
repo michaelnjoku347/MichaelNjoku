@@ -178,6 +178,49 @@ try {
     await page.close();
   }
 
+  console.log('\n/cubelight/ (demo)');
+  {
+    const { page, errors, status } = await open('/cubelight/');
+    check(status === 200, `responds 200 (got ${status})`);
+    await page.waitForFunction(() => {
+      const el = document.getElementById('rebate-spp');
+      if (!el) return false;
+      const n = parseInt(el.textContent, 10);
+      return Number.isFinite(n) && n >= 1;
+    }, { timeout: 45000 });
+    check((await page.title()).includes('Cubelight'), 'Cubelight app boots');
+    const wasm = await page.evaluate(() => fetch('/cubelight/cubelight.wasm').then((r) => r.status));
+    check(wasm === 200, 'cubelight.wasm responds 200');
+    await page.screenshot({ path: `${shots}/cubelight-demo.png` });
+    const cubelightErrors = errors.filter((message) => !/favicon\.ico/i.test(message));
+    check(cubelightErrors.length === 0, `no console or network errors${cubelightErrors.length ? `:\n      ${cubelightErrors.join('\n      ')}` : ''}`);
+    await page.close();
+  }
+
+  console.log('\n/agent-allowance/ (demo)');
+  {
+    const { page, errors, status } = await open('/agent-allowance/');
+    check(status === 200, `responds 200 (got ${status})`);
+    await page.waitForFunction(() => document.body?.innerText?.includes('Public demo') || document.body?.innerText?.includes('Remaining') || document.body?.innerText?.includes('Spending power'), {
+      timeout: 30000,
+    });
+    const health = await page.evaluate(async () => {
+      const response = await fetch('/api/health');
+      return { status: response.status, body: await response.json() };
+    });
+    check(health.status === 200 && health.body.ok === true, 'portfolio mock answers /api/health');
+    const run = await page.evaluate(async () => {
+      const response = await fetch('/api/run-agent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      return { status: response.status, body: await response.json() };
+    });
+    check(run.status === 200 && run.body.simulated === true, 'Run agent records a simulated step');
+    await page.screenshot({ path: `${shots}/agent-allowance-demo.png` });
+    // Ignore noisy third-party Ledger kit warnings if any; keep same-origin failures.
+    const localErrors = errors.filter((message) => !/ledger|WebHID|MetaMask/i.test(message));
+    check(localErrors.length === 0, `no console or network errors${localErrors.length ? `:\n      ${localErrors.join('\n      ')}` : ''}`);
+    await page.close();
+  }
+
   console.log('\n404');
   {
     const { page, status } = await open('/no-such-page/');

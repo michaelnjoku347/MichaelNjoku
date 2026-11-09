@@ -35,6 +35,7 @@ export default defineConfig({
       customPages: [
         'https://njoku.dev/kilobyte/',
         'https://njoku.dev/orbitscope/',
+        'https://njoku.dev/orbitscope/cubelight/',
         'https://njoku.dev/agent-allowance/',
       ],
       filter: (page) => !page.includes('/404') && !page.includes('/contact/thanks'),

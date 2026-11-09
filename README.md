@@ -76,14 +76,15 @@ The script applies [`scripts/kilobyte-subpath.patch`](scripts/kilobyte-subpath.p
 
 ## Update the OrbitScope demo
 
-OrbitScope’s hosted demo is Cubelight (the WASM ray tracer in that repo). A copy lives in `public/orbitscope/`:
+The hosted demo in `public/orbitscope/` is the Cesium globe (frozen CelesTrak snapshot) plus Cubelight at `/orbitscope/cubelight/`:
 
 ```bash
-npm run orbitscope                              # latest OrbitScope main
-ORBITSCOPE_DIR=../OrbitScope npm run orbitscope # or a local checkout
+npm run orbitscope                                 # latest OrbitScope main
+ORBITSCOPE_DIR=../OrbitScope npm run orbitscope    # or a local checkout
+ORBITSCOPE_REFRESH=1 npm run orbitscope            # re-dump the globe snapshot from a live API
 ```
 
-`npm run cubelight` is an alias for the same build. Commit the updated `public/orbitscope/` folder. Old `/cubelight/` URLs redirect to `/orbitscope/`.
+`npm run cubelight` is an alias for the same build. Commit `public/orbitscope/` and, after a refresh, `scripts/orbitscope-data/`. Old `/cubelight/` URLs redirect to `/orbitscope/`.
 
 ## Update the Agent Allowance demo
 

@@ -2,9 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/cubelight", "destination": "/orbitscope/", "permanent": true },
-    { "source": "/cubelight/", "destination": "/orbitscope/", "permanent": true },
-    { "source": "/cubelight/:path*", "destination": "/orbitscope/:path*", "permanent": true }
+    { "source": "/cubelight", "destination": "/orbitscope/cubelight/", "permanent": true },
+    { "source": "/cubelight/", "destination": "/orbitscope/cubelight/", "permanent": true },
+    { "source": "/cubelight/:path*", "destination": "/orbitscope/cubelight/:path*", "permanent": true }
   ],
   "headers": [
     {
@@ -22,6 +22,14 @@
     {
       "source": "/orbitscope/(.*)\\.wasm",
       "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
+    },
+    {
+      "source": "/orbitscope/cesium/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/orbitscope/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
       "source": "/(.*)",

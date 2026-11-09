@@ -1,6 +1,6 @@
 # njoku.dev
 
-Michael Njoku’s personal site. It lists his projects — with playable demos for [Kilobyte](https://njoku.dev/kilobyte/), [Cubelight](https://njoku.dev/cubelight/) (from OrbitScope), and [Agent Allowance](https://njoku.dev/agent-allowance/) — his experience, and a printable résumé.
+Michael Njoku’s personal site. It lists his projects — with playable demos for [Kilobyte](https://njoku.dev/kilobyte/), [OrbitScope](https://njoku.dev/orbitscope/), and [Agent Allowance](https://njoku.dev/agent-allowance/) — his experience, and a printable résumé.
 
 You don’t need to know Astro to keep this up to date. Astro is the tool that turns the files in this repo into a website. Each page is a mix of HTML and a little JavaScript at the top; when you run a build, Astro writes plain HTML, CSS, and JS that Vercel hosts. There is no database. Changing a Markdown file and pushing to GitHub is enough for a new project to show up.
 
@@ -13,7 +13,7 @@ You don’t need to know Astro to keep this up to date. Astro is the tool that t
 | Agent Allowance | `/projects/agent-allowance/` |
 | Kilobyte case study | `/projects/kilobyte/` |
 | Kilobyte live demo | `/kilobyte/` |
-| Cubelight live demo | `/cubelight/` |
+| OrbitScope live demo | `/orbitscope/` |
 | Agent Allowance live demo | `/agent-allowance/` |
 | Résumé (print or save as PDF) | `/resume/` |
 
@@ -74,16 +74,16 @@ KILOBYTE_DIR=../KiloByte npm run kilobyte   # or a local checkout
 
 The script applies [`scripts/kilobyte-subpath.patch`](scripts/kilobyte-subpath.patch) only if Kilobyte still assumes it is served from `/`. Current Kilobyte prefixes those paths with Vite’s `BASE_URL`, so the script skips the patch. Commit the updated `public/kilobyte/` folder.
 
-## Update the Cubelight demo
+## Update the OrbitScope demo
 
-Cubelight is the WASM ray tracer from [OrbitScope](https://github.com/michaelnjoku347/OrbitScope). A copy lives in `public/cubelight/`:
+OrbitScope’s hosted demo is Cubelight (the WASM ray tracer in that repo). A copy lives in `public/orbitscope/`:
 
 ```bash
-npm run cubelight                              # latest OrbitScope main
-ORBITSCOPE_DIR=../OrbitScope npm run cubelight # or a local checkout
+npm run orbitscope                              # latest OrbitScope main
+ORBITSCOPE_DIR=../OrbitScope npm run orbitscope # or a local checkout
 ```
 
-Commit the updated `public/cubelight/` folder.
+`npm run cubelight` is an alias for the same build. Commit the updated `public/orbitscope/` folder. Old `/cubelight/` URLs redirect to `/orbitscope/`.
 
 ## Update the Agent Allowance demo
 

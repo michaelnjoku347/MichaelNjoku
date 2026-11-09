@@ -178,9 +178,9 @@ try {
     await page.close();
   }
 
-  console.log('\n/cubelight/ (demo)');
+  console.log('\n/orbitscope/ (demo)');
   {
-    const { page, errors, status } = await open('/cubelight/');
+    const { page, errors, status } = await open('/orbitscope/');
     check(status === 200, `responds 200 (got ${status})`);
     await page.waitForFunction(() => {
       const el = document.getElementById('rebate-spp');
@@ -188,12 +188,14 @@ try {
       const n = parseInt(el.textContent, 10);
       return Number.isFinite(n) && n >= 1;
     }, { timeout: 45000 });
-    check((await page.title()).includes('Cubelight'), 'Cubelight app boots');
-    const wasm = await page.evaluate(() => fetch('/cubelight/cubelight.wasm').then((r) => r.status));
-    check(wasm === 200, 'cubelight.wasm responds 200');
-    await page.screenshot({ path: `${shots}/cubelight-demo.png` });
-    const cubelightErrors = errors.filter((message) => !/favicon\.ico/i.test(message));
-    check(cubelightErrors.length === 0, `no console or network errors${cubelightErrors.length ? `:\n      ${cubelightErrors.join('\n      ')}` : ''}`);
+    const title = await page.title();
+    check(title.includes('OrbitScope'), `OrbitScope demo boots (title: ${title})`);
+    check((await page.$eval('h1', (h1) => h1.textContent)).includes('OrbitScope'), 'demo brands as OrbitScope');
+    const wasm = await page.evaluate(() => fetch('/orbitscope/cubelight.wasm').then((r) => r.status));
+    check(wasm === 200, 'cubelight.wasm responds 200 under /orbitscope/');
+    await page.screenshot({ path: `${shots}/orbitscope-demo.png` });
+    const orbitscopeErrors = errors.filter((message) => !/favicon\.ico/i.test(message));
+    check(orbitscopeErrors.length === 0, `no console or network errors${orbitscopeErrors.length ? `:\n      ${orbitscopeErrors.join('\n      ')}` : ''}`);
     await page.close();
   }
 

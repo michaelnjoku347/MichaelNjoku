@@ -74,6 +74,7 @@ try {
     ['/projects/kilobyte/', 'kilobyte-case-study'],
     ['/projects/njoku-dev/', 'njoku-dev'],
     ['/projects/orbitscope/', 'orbitscope'],
+    ['/projects/agent-allowance/', 'agent-allowance'],
     ['/resume/', 'resume'],
     ['/contact/thanks/', 'contact-thanks'],
   ]) {

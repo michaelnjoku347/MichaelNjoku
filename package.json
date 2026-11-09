@@ -13,6 +13,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "kilobyte": "node scripts/build-kilobyte.mjs",
+    "orbitscope": "node scripts/build-orbitscope.mjs",
     "cubelight": "node scripts/build-cubelight.mjs",
     "agent-allowance": "node scripts/build-agent-allowance.mjs",
     "images": "node scripts/generate-images.mjs",
